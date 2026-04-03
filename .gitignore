@@ -1,0 +1,22 @@
+# ── Python ────────────────────────────────────────────────────────────────────
+backend/.venv/
+backend/__pycache__/
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+
+# ── Base de datos (generada en runtime por refresh.py) ────────────────────────
+backend/forecast.db
+
+# ── Variables de entorno (contienen secretos) ─────────────────────────────────
+backend/.env
+frontend/.env
+
+# ── Node ──────────────────────────────────────────────────────────────────────
+frontend/node_modules/
+
+# ── Build del frontend (se genera con npm run build) ─────────────────────────
+frontend/dist/
+
+# ── macOS ─────────────────────────────────────────────────────────────────────
+.DS_Store
