@@ -1,0 +1,256 @@
+import { useState, useRef, useEffect } from 'react'
+
+// ── Iberian Peninsula SVG ─────────────────────────────────────────────────────
+function IberiaIcon() {
+  return (
+    <svg viewBox="0 0 52 46" width="38" height="34" style={{ display: 'block', filter: 'drop-shadow(0 0 4px #22c55e88)' }}>
+      <defs>
+        <linearGradient id="iberia-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%"   stopColor="#22c55e" stopOpacity="0.9" />
+          <stop offset="50%"  stopColor="#eab308" stopOpacity="0.8" />
+          <stop offset="100%" stopColor="#ef4444" stopOpacity="0.9" />
+        </linearGradient>
+      </defs>
+      {/* Peninsula outline (simplified) */}
+      <path
+        d="M 8,11
+           C 6,9 4,8 5,6
+           C 6,4 10,3 15,3
+           L 33,2
+           C 37,2 42,5 44,9
+           L 45,17
+           C 46,21 44,25 42,28
+           L 37,35
+           C 33,40 27,44 21,43
+           L 14,39
+           C 10,36 7,31 6,26
+           L 4,18
+           Z"
+        fill="url(#iberia-grad)"
+        fillOpacity="0.25"
+        stroke="url(#iberia-grad)"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+      />
+      {/* Portugal border (approximate) */}
+      <path
+        d="M 8,11 L 6,26 L 14,39 L 18,40 L 16,30 L 10,22 L 9,14 Z"
+        fill="none"
+        stroke="#22c55e"
+        strokeWidth="0.8"
+        strokeOpacity="0.5"
+        strokeDasharray="2,2"
+      />
+      {/* Canarias (small dots) */}
+      <circle cx="10" cy="42" r="1.2" fill="#eab308" fillOpacity="0.7" />
+      <circle cx="13" cy="43" r="1"   fill="#eab308" fillOpacity="0.6" />
+      <circle cx="16" cy="44" r="1"   fill="#eab308" fillOpacity="0.6" />
+    </svg>
+  )
+}
+
+// ── Radar logo ────────────────────────────────────────────────────────────────
+function RadarLogo() {
+  return (
+    <div style={logo.wrap}>
+      <IberiaIcon />
+      {/* Gradient text */}
+      <span style={logo.text}>FORECASTER</span>
+    </div>
+  )
+}
+
+const logo = {
+  wrap: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 10,
+    userSelect: 'none',
+  },
+  text: {
+    fontSize: 20,
+    fontWeight: 800,
+    letterSpacing: '0.12em',
+    background: 'linear-gradient(to right, #22c55e, #eab308, #ef4444)',
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent',
+    backgroundClip: 'text',
+  },
+}
+
+// ── Spot search ───────────────────────────────────────────────────────────────
+function SpotSearch({ spots, onSelectSpot }) {
+  const [query, setQuery] = useState('')
+  const [open, setOpen] = useState(false)
+  const wrapRef = useRef(null)
+
+  const results = query.length < 1 ? [] : spots.filter(s =>
+    s.name?.toLowerCase().includes(query.toLowerCase()) ||
+    s.region?.toLowerCase().includes(query.toLowerCase())
+  ).slice(0, 8)
+
+  // Close on outside click
+  useEffect(() => {
+    function handle(e) {
+      if (wrapRef.current && !wrapRef.current.contains(e.target)) setOpen(false)
+    }
+    document.addEventListener('mousedown', handle)
+    return () => document.removeEventListener('mousedown', handle)
+  }, [])
+
+  function pick(spot) {
+    onSelectSpot(spot)
+    setQuery('')
+    setOpen(false)
+  }
+
+  return (
+    <div ref={wrapRef} style={search.wrap}>
+      <div style={search.inputWrap}>
+        <span style={search.icon}>⌕</span>
+        <input
+          style={search.input}
+          placeholder="Buscar spot…"
+          value={query}
+          onChange={e => { setQuery(e.target.value); setOpen(true) }}
+          onFocus={() => setOpen(true)}
+        />
+        {query && (
+          <button style={search.clear} onClick={() => { setQuery(''); setOpen(false) }}>✕</button>
+        )}
+      </div>
+      {open && results.length > 0 && (
+        <div style={search.dropdown}>
+          {results.map(spot => (
+            <button key={spot.id} style={search.item} onClick={() => pick(spot)}>
+              <span style={search.itemName}>{spot.name}</span>
+              <span style={search.itemRegion}>{spot.region}</span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+const search = {
+  wrap: {
+    position: 'relative',
+    width: 240,
+  },
+  inputWrap: {
+    display: 'flex',
+    alignItems: 'center',
+    background: '#162040',
+    border: '1px solid #1e3a5f',
+    borderRadius: 8,
+    padding: '0 10px',
+    gap: 6,
+  },
+  icon: {
+    fontSize: 16,
+    color: '#475569',
+    lineHeight: 1,
+  },
+  input: {
+    flex: 1,
+    background: 'none',
+    border: 'none',
+    outline: 'none',
+    color: '#e2e8f0',
+    fontSize: 13,
+    padding: '8px 0',
+    fontFamily: 'inherit',
+  },
+  clear: {
+    background: 'none',
+    border: 'none',
+    color: '#475569',
+    cursor: 'pointer',
+    fontSize: 11,
+    padding: '2px 0',
+    lineHeight: 1,
+  },
+  dropdown: {
+    position: 'absolute',
+    top: 'calc(100% + 4px)',
+    left: 0,
+    right: 0,
+    background: '#111e35',
+    border: '1px solid #1e3a5f',
+    borderRadius: 8,
+    overflow: 'hidden',
+    zIndex: 9999,
+    boxShadow: '0 8px 24px rgba(0,0,0,0.5)',
+  },
+  item: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%',
+    background: 'none',
+    border: 'none',
+    borderBottom: '1px solid #1e3a5f22',
+    padding: '9px 12px',
+    cursor: 'pointer',
+    color: 'inherit',
+    textAlign: 'left',
+    transition: 'background 0.1s',
+    fontFamily: 'inherit',
+  },
+  itemName: {
+    fontSize: 13,
+    fontWeight: 600,
+    color: '#e2e8f0',
+  },
+  itemRegion: {
+    fontSize: 11,
+    color: '#64748b',
+    marginLeft: 8,
+  },
+}
+
+// ── Header ────────────────────────────────────────────────────────────────────
+export default function Header({ spots, onSelectSpot, onLogout }) {
+  return (
+    <header style={hdr.wrap}>
+      <div style={hdr.left}><RadarLogo /></div>
+      <div style={hdr.center}>
+        <SpotSearch spots={spots} onSelectSpot={onSelectSpot} />
+      </div>
+      <div style={hdr.right}>
+        {onLogout && (
+          <button onClick={onLogout} style={hdr.logoutBtn} title="Cerrar sesión">
+            Salir
+          </button>
+        )}
+      </div>
+    </header>
+  )
+}
+
+const hdr = {
+  wrap: {
+    display: 'flex',
+    alignItems: 'center',
+    padding: '0 20px',
+    height: 52,
+    background: '#0d1b2e',
+    borderBottom: '1px solid #1e3a5f',
+    flexShrink: 0,
+    zIndex: 1100,
+  },
+  left:   { flex: 1 },
+  center: { display: 'flex', justifyContent: 'center' },
+  right:  { flex: 1, display: 'flex', justifyContent: 'flex-end', alignItems: 'center' },
+  logoutBtn: {
+    background: 'none',
+    border: '1px solid #1e3a5f',
+    borderRadius: 6,
+    color: '#475569',
+    fontSize: 12,
+    padding: '5px 12px',
+    cursor: 'pointer',
+    fontFamily: 'inherit',
+  },
+}
