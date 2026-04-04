@@ -6,6 +6,7 @@ import WindguruModal from './components/WindguruModal'
 import Header from './components/Header'
 import LoginScreen from './components/LoginScreen'
 import MobileLayout from './components/MobileLayout'
+import RotatePrompt from './components/RotatePrompt'
 import { useMobile } from './hooks/useMobile'
 
 const TOKEN_KEY = 'forecaster_token'
@@ -76,6 +77,7 @@ export default function App() {
   if (mobile) {
     return (
       <div style={styles.shell}>
+        <RotatePrompt />
         <Header spots={spots} onSelectSpot={handleSearchSelect} onLogout={handleLogout} mobile />
         <MobileLayout
           sport={sport}
