@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import MapView from './components/MapView'
 import Ranking from './components/Ranking'
 import SportSelector from './components/SportSelector'
@@ -57,6 +58,14 @@ export default function App() {
     setModalSpot(spot)
   }
 
+  // Portal so the modal always renders on document.body — never clipped by overflow:hidden parents (iOS Safari bug)
+  const modal = modalSpot
+    ? createPortal(
+        <WindguruModal spot={modalSpot} sport={sport} onClose={() => setModalSpot(null)} />,
+        document.body
+      )
+    : null
+
   const mapOnly = (
     <>
       {error ? (
@@ -86,22 +95,12 @@ export default function App() {
         >
           {mapOnly}
         </MobileLayout>
-        {/* Modal rendered at root level so it's never clipped */}
-        {modalSpot && (
-          <WindguruModal spot={modalSpot} sport={sport} onClose={() => setModalSpot(null)} />
-        )}
+        {modal}
       </div>
     )
   }
 
-  const mapContent = (
-    <>
-      {mapOnly}
-      {modalSpot && (
-        <WindguruModal spot={modalSpot} sport={sport} onClose={() => setModalSpot(null)} />
-      )}
-    </>
-  )
+  const mapContent = <>{mapOnly}{modal}</>
 
   return (
     <div style={styles.shell}>
