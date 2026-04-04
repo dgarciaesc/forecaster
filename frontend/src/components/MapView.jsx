@@ -1,7 +1,8 @@
 import { useEffect, useState, useRef } from 'react'
-import { MapContainer, TileLayer, CircleMarker, Tooltip, useMap } from 'react-leaflet'
+import { MapContainer, TileLayer, CircleMarker, Tooltip, useMap, useMapEvents } from 'react-leaflet'
 import HeatmapLayer, { daysToRGB } from './HeatmapLayer'
 import SpotInfoCard from './SpotInfoCard'
+import { useMobile } from '../hooks/useMobile'
 
 const SPORT_COLOR = {
   surf:     '#38bdf8',
@@ -152,8 +153,34 @@ function HoverMarker({ spot, color, accentColor, isSelected, onClick, qd }) {
   )
 }
 
+// ── Mobile tap handler ────────────────────────────────────────────────────────
+// Leaflet SVG marker click events are unreliable on iOS. Instead we listen on
+// the map-level click event (which fires reliably on touch) and find the
+// nearest spot by pixel distance.
+function MobileClickHandler({ spots, onSelect, onOpenModal }) {
+  const map = useMap()
+  useMapEvents({
+    click(e) {
+      const clickPt = map.latLngToContainerPoint(e.latlng)
+      let nearest = null
+      let minDist = Infinity
+      for (const spot of spots) {
+        const sp = map.latLngToContainerPoint([spot.lat, spot.lon])
+        const d = Math.hypot(clickPt.x - sp.x, clickPt.y - sp.y)
+        if (d < minDist) { minDist = d; nearest = spot }
+      }
+      if (nearest && minDist < 40) {
+        onSelect(nearest)
+        onOpenModal(nearest)
+      }
+    },
+  })
+  return null
+}
+
 export default function MapView({ spots, seaPoints = [], sport, selected, onSelect, onOpenModal, showHeatmap }) {
   const [infoSpot, setInfoSpot] = useState(null)
+  const mobile = useMobile()
 
   // Open card automatically when a spot is selected
   useEffect(() => {
@@ -167,7 +194,6 @@ export default function MapView({ spots, seaPoints = [], sport, selected, onSele
         zoom={5}
         style={{ height: '100%', width: '100%', background: '#0a1628' }}
         zoomControl={true}
-        tap={false}
       >
         <TileLayer
           url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
@@ -199,6 +225,10 @@ export default function MapView({ spots, seaPoints = [], sport, selected, onSele
             />
           )
         })}
+
+        {mobile && (
+          <MobileClickHandler spots={spots} onSelect={onSelect} onOpenModal={onOpenModal} />
+        )}
       </MapContainer>
 
       {showHeatmap && <HeatmapLegend />}
