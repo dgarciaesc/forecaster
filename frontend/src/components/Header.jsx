@@ -1,60 +1,13 @@
 import { useState, useRef, useEffect } from 'react'
 
-// ── Iberian Peninsula SVG ─────────────────────────────────────────────────────
-function IberiaIcon() {
-  return (
-    <svg viewBox="0 0 52 46" width="38" height="34" style={{ display: 'block', filter: 'drop-shadow(0 0 4px #22c55e88)' }}>
-      <defs>
-        <linearGradient id="iberia-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%"   stopColor="#22c55e" stopOpacity="0.9" />
-          <stop offset="50%"  stopColor="#eab308" stopOpacity="0.8" />
-          <stop offset="100%" stopColor="#ef4444" stopOpacity="0.9" />
-        </linearGradient>
-      </defs>
-      {/* Peninsula outline (simplified) */}
-      <path
-        d="M 8,11
-           C 6,9 4,8 5,6
-           C 6,4 10,3 15,3
-           L 33,2
-           C 37,2 42,5 44,9
-           L 45,17
-           C 46,21 44,25 42,28
-           L 37,35
-           C 33,40 27,44 21,43
-           L 14,39
-           C 10,36 7,31 6,26
-           L 4,18
-           Z"
-        fill="url(#iberia-grad)"
-        fillOpacity="0.25"
-        stroke="url(#iberia-grad)"
-        strokeWidth="1.5"
-        strokeLinejoin="round"
-      />
-      {/* Portugal border (approximate) */}
-      <path
-        d="M 8,11 L 6,26 L 14,39 L 18,40 L 16,30 L 10,22 L 9,14 Z"
-        fill="none"
-        stroke="#22c55e"
-        strokeWidth="0.8"
-        strokeOpacity="0.5"
-        strokeDasharray="2,2"
-      />
-      {/* Canarias (small dots) */}
-      <circle cx="10" cy="42" r="1.2" fill="#eab308" fillOpacity="0.7" />
-      <circle cx="13" cy="43" r="1"   fill="#eab308" fillOpacity="0.6" />
-      <circle cx="16" cy="44" r="1"   fill="#eab308" fillOpacity="0.6" />
-    </svg>
-  )
-}
-
 // ── Radar logo ────────────────────────────────────────────────────────────────
 function RadarLogo() {
   return (
     <div style={logo.wrap}>
-      <IberiaIcon />
-      {/* Gradient text */}
+      <div style={logo.ring}>
+        <div style={logo.sweep} />
+        <div style={logo.dot} />
+      </div>
       <span style={logo.text}>FORECASTER</span>
     </div>
   )
@@ -64,8 +17,36 @@ const logo = {
   wrap: {
     display: 'flex',
     alignItems: 'center',
-    gap: 10,
+    gap: 12,
     userSelect: 'none',
+  },
+  ring: {
+    position: 'relative',
+    width: 36,
+    height: 36,
+    borderRadius: '50%',
+    border: '1.5px solid #22c55e55',
+    background: 'radial-gradient(circle, #0d2218 0%, #0a1628 100%)',
+    flexShrink: 0,
+    overflow: 'hidden',
+  },
+  sweep: {
+    position: 'absolute',
+    inset: 0,
+    borderRadius: '50%',
+    background: 'conic-gradient(from 0deg, transparent 0deg, rgba(34,197,94,0.55) 55deg, transparent 55deg)',
+    animation: 'radar-spin 2.4s linear infinite',
+  },
+  dot: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 4,
+    height: 4,
+    borderRadius: '50%',
+    background: '#22c55e',
+    boxShadow: '0 0 6px #22c55e',
   },
   text: {
     fontSize: 20,
