@@ -167,6 +167,7 @@ export default function MapView({ spots, seaPoints = [], sport, selected, onSele
         zoom={5}
         style={{ height: '100%', width: '100%', background: '#0a1628' }}
         zoomControl={true}
+        tap={false}
       >
         <TileLayer
           url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
