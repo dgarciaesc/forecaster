@@ -129,7 +129,16 @@ async def lifespan(app: FastAPI):
     if not _snapshot or age > 7200:
         asyncio.create_task(do_refresh())
 
+    # Hourly refresh loop
+    async def _hourly_loop():
+        while True:
+            await asyncio.sleep(3600)
+            print("[scheduler] hourly refresh starting…")
+            await do_refresh()
+
+    task = asyncio.create_task(_hourly_loop())
     yield
+    task.cancel()
 
 
 app = FastAPI(title="Forecaster API", lifespan=lifespan)
