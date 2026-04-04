@@ -139,7 +139,7 @@ function maskLand(ctx, map, landGeoJSON) {
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
-export default function HeatmapLayer({ spots, sport, opacity = 0.55 }) {
+export default function HeatmapLayer({ spots, sport, opacity = 0.55, selectedDay = null }) {
   const map = useMap()
   const canvasRef = useRef(null)
   const rafRef = useRef(null)
@@ -154,9 +154,20 @@ export default function HeatmapLayer({ spots, sport, opacity = 0.55 }) {
   // Keep data points in sync
   useEffect(() => {
     ptsRef.current = spots
-      .filter(s => s.summary?.[sport])
-      .map(s => ({ lat: s.lat, lon: s.lon, score: s.summary[sport].quality_days ?? 0 }))
-  }, [spots, sport])
+      .filter(s => selectedDay ? s.hourly?.length > 0 : s.summary?.[sport])
+      .map(s => {
+        let score
+        if (selectedDay) {
+          const hrs = (s.hourly ?? []).filter(h => h.time.startsWith(selectedDay))
+          const sc = hrs.map(h => h.scores?.[sport] ?? 0)
+          const avg = sc.length > 0 ? sc.reduce((a, b) => a + b, 0) / sc.length : 0
+          score = (avg / 100) * 7
+        } else {
+          score = s.summary?.[sport]?.quality_days ?? 0
+        }
+        return { lat: s.lat, lon: s.lon, score }
+      })
+  }, [spots, sport, selectedDay])
 
   // Create Leaflet pane + canvas once
   useEffect(() => {
@@ -237,7 +248,7 @@ export default function HeatmapLayer({ spots, sport, opacity = 0.55 }) {
 
   useEffect(() => {
     scheduleRender()
-  }, [scheduleRender, spots, sport])
+  }, [scheduleRender, spots, sport, selectedDay])
 
   useMapEvents({
     move:   scheduleRender,

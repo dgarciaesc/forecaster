@@ -25,6 +25,7 @@ export default function App() {
   const [selected, setSelected] = useState(null)
   const [modalSpot, setModalSpot] = useState(null)
   const [showHeatmap, setShowHeatmap] = useState(true)
+  const [selectedDay, setSelectedDay] = useState(null)
 
   function handleLogin(credentialResponse) {
     const t = credentialResponse.credential
@@ -76,9 +77,11 @@ export default function App() {
           spots={spots} seaPoints={seaPoints} sport={sport}
           selected={selected} onSelect={setSelected}
           onOpenModal={setModalSpot} showHeatmap={showHeatmap}
+          selectedDay={selectedDay}
         />
       )}
-      <HeatmapToggle active={showHeatmap} onChange={setShowHeatmap} />
+      <DaySelector spots={spots} selectedDay={selectedDay} onChange={setSelectedDay} />
+    <HeatmapToggle active={showHeatmap} onChange={setShowHeatmap} />
     </>
   )
 
@@ -128,6 +131,63 @@ export default function App() {
         <Legend />
       </aside>
     </div>
+    </div>
+  )
+}
+
+function DaySelector({ spots, selectedDay, onChange }) {
+  const days = []
+  if (spots.length && spots[0].hourly?.length) {
+    const seen = new Set()
+    for (const h of spots[0].hourly) {
+      const d = h.time.slice(0, 10)
+      if (!seen.has(d)) { seen.add(d); days.push(d) }
+    }
+  }
+  if (days.length === 0) return null
+
+  function fmtDay(dateStr) {
+    const d = new Date(dateStr + 'T12:00:00')
+    const wd = d.toLocaleDateString('es-ES', { weekday: 'short' })
+    return { wd: wd.slice(0, 3), num: d.getDate() }
+  }
+
+  return (
+    <div style={{
+      position: 'absolute', top: 10, left: '50%', transform: 'translateX(-50%)',
+      zIndex: 1000, display: 'flex', gap: 4, alignItems: 'center',
+      background: 'rgba(10,22,40,0.88)', border: '1px solid #1e3a5f',
+      borderRadius: 10, padding: '5px 7px', backdropFilter: 'blur(8px)',
+    }}>
+      <button
+        onClick={() => onChange(null)}
+        style={{
+          background: selectedDay === null ? '#1e3a5f' : 'none',
+          border: `1px solid ${selectedDay === null ? '#38bdf8' : 'transparent'}`,
+          color: selectedDay === null ? '#38bdf8' : '#64748b',
+          borderRadius: 6, padding: '4px 9px', cursor: 'pointer',
+          fontSize: 11, fontWeight: 700, fontFamily: 'inherit',
+        }}
+      >
+        7d
+      </button>
+      {days.map(day => {
+        const { wd, num } = fmtDay(day)
+        const active = selectedDay === day
+        return (
+          <button key={day} onClick={() => onChange(day)} style={{
+            background: active ? '#1e3a5f' : 'none',
+            border: `1px solid ${active ? '#38bdf8' : 'transparent'}`,
+            color: active ? '#38bdf8' : '#94a3b8',
+            borderRadius: 6, padding: '3px 8px', cursor: 'pointer',
+            fontFamily: 'inherit', display: 'flex', flexDirection: 'column',
+            alignItems: 'center', gap: 1, minWidth: 32,
+          }}>
+            <span style={{ fontSize: 9, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{wd}</span>
+            <span style={{ fontSize: 13, fontWeight: 700 }}>{num}</span>
+          </button>
+        )
+      })}
     </div>
   )
 }

@@ -178,7 +178,7 @@ function MobileClickHandler({ spots, onSelect, onOpenModal }) {
   return null
 }
 
-export default function MapView({ spots, seaPoints = [], sport, selected, onSelect, onOpenModal, showHeatmap }) {
+export default function MapView({ spots, seaPoints = [], sport, selected, onSelect, onOpenModal, showHeatmap, selectedDay }) {
   const [infoSpot, setInfoSpot] = useState(null)
   const mobile = useMobile()
 
@@ -202,7 +202,7 @@ export default function MapView({ spots, seaPoints = [], sport, selected, onSele
         />
 
         {showHeatmap && spots.length > 0 && (
-          <HeatmapLayer spots={[...spots, ...seaPoints]} sport={sport} opacity={0.55} />
+          <HeatmapLayer spots={[...spots, ...seaPoints]} sport={sport} opacity={0.55} selectedDay={selectedDay} />
         )}
 
         {selected && <FlyTo spot={selected} />}

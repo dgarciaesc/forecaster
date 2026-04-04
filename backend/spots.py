@@ -95,4 +95,24 @@ SEA_POINTS = [
     # Mid-Atlantic ridge area (very different swell)
     {"id": 119, "lat": 33.0, "lon": -16.0, "coast_facing": 270},
     {"id": 120, "lat": 35.0, "lon": -14.0, "coast_facing": 270},
+    # Northern Atlantic / Bay of Biscay deep water
+    {"id": 121, "lat": 48.0, "lon":  -8.0, "coast_facing": 180},
+    {"id": 122, "lat": 47.0, "lon": -11.0, "coast_facing": 270},
+    {"id": 123, "lat": 46.5, "lon": -15.0, "coast_facing": 270},
+    # Atlantic south of Portugal / Morocco
+    {"id": 124, "lat": 34.0, "lon":  -9.5, "coast_facing": 270},
+    {"id": 125, "lat": 31.5, "lon": -11.0, "coast_facing": 270},
+    {"id": 126, "lat": 29.0, "lon":  -9.0, "coast_facing": 270},
+    # Central Mediterranean (Balearics area)
+    {"id": 127, "lat": 39.5, "lon":   1.0, "coast_facing": 180},
+    {"id": 128, "lat": 37.5, "lon":   1.5, "coast_facing": 180},
+    {"id": 129, "lat": 36.8, "lon":   4.5, "coast_facing": 180},
+    # Eastern Mediterranean / Gulf of Lion
+    {"id": 130, "lat": 43.5, "lon":   7.5, "coast_facing":  90},
+    {"id": 131, "lat": 42.0, "lon":   9.0, "coast_facing":  90},
+    {"id": 132, "lat": 40.0, "lon":  12.0, "coast_facing":  90},
+    # Far Canarias / subtropical Atlantic
+    {"id": 133, "lat": 32.0, "lon": -20.0, "coast_facing": 270},
+    {"id": 134, "lat": 30.5, "lon": -22.0, "coast_facing": 270},
+    {"id": 135, "lat": 26.0, "lon": -19.0, "coast_facing": 270},
 ]
