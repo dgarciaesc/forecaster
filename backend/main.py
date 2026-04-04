@@ -118,11 +118,17 @@ async def lifespan(app: FastAPI):
     init_db()
     _snapshot     = load_spots(table="forecast")
     _sea_snapshot = load_spots(table="sea_points")
+
+    age = int(time.time() - last_refresh())
     if _snapshot:
-        age = int(time.time() - last_refresh())
         print(f"[startup] loaded {len(_snapshot)} spots + {len(_sea_snapshot or [])} sea points (age: {age}s)")
     else:
-        print("[startup] DB empty — call GET /api/refresh to populate")
+        print("[startup] DB empty — triggering auto-refresh")
+
+    # Refresh on startup if DB is empty or data is older than 2 hours
+    if not _snapshot or age > 7200:
+        asyncio.create_task(do_refresh())
+
     yield
 
 
