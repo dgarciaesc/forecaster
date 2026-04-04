@@ -9,7 +9,7 @@ const SPORTS = [
   { id: 'kitesurf', label: 'Kitesurf', Icon: KitesurfIcon, color: 'var(--kitesurf)' },
 ]
 
-function SportBar({ sport, onChange }) {
+function SportBar({ sport, onChange, onToggleRanking, rankingOpen }) {
   return (
     <div style={s.sportBar}>
       {SPORTS.map(({ id, label, Icon, color }) => {
@@ -19,7 +19,7 @@ function SportBar({ sport, onChange }) {
             key={id}
             onClick={() => onChange(id)}
             style={{
-              ...s.sportBtn,
+              ...s.btn,
               color: active ? color : 'var(--muted)',
               borderBottom: active ? `2px solid ${color}` : '2px solid transparent',
             }}
@@ -31,6 +31,20 @@ function SportBar({ sport, onChange }) {
           </button>
         )
       })}
+
+      {/* Ranking tab */}
+      <button
+        onClick={onToggleRanking}
+        style={{
+          ...s.btn,
+          color: rankingOpen ? '#e2e8f0' : 'var(--muted)',
+          borderBottom: rankingOpen ? '2px solid #e2e8f0' : '2px solid transparent',
+          borderLeft: '1px solid #1e3a5f',
+        }}
+      >
+        <span style={{ fontSize: 16, lineHeight: 1 }}>☰</span>
+        <span style={{ fontSize: 11, fontWeight: rankingOpen ? 700 : 400 }}>Ranking</span>
+      </button>
     </div>
   )
 }
@@ -41,7 +55,7 @@ function RankingDrawer({ open, spots, sport, selected, onSelect, onClose }) {
     <>
       <div onClick={onClose} style={s.backdrop} />
       <div style={s.drawer}>
-        <div style={s.drawerHandle} />
+        <div style={s.handle} />
         <div style={s.drawerTitle}>Ranking · 7 días</div>
         <div style={s.drawerScroll}>
           <Ranking
@@ -61,17 +75,15 @@ export default function MobileLayout({ sport, onSportChange, spots, selected, on
 
   return (
     <div style={s.root}>
-      {/* Sport selector above the map */}
-      <SportBar sport={sport} onChange={id => { onSportChange(id); setRankingOpen(false) }} />
+      <SportBar
+        sport={sport}
+        onChange={id => { onSportChange(id); setRankingOpen(false) }}
+        onToggleRanking={() => setRankingOpen(v => !v)}
+        rankingOpen={rankingOpen}
+      />
 
-      {/* Map fills remaining space */}
       <div style={s.mapWrap}>
         {children}
-
-        {/* Floating ranking button */}
-        <button style={s.rankingBtn} onClick={() => setRankingOpen(v => !v)}>
-          ☰ Ranking
-        </button>
       </div>
 
       <RankingDrawer
@@ -93,15 +105,13 @@ const s = {
     flex: 1,
     overflow: 'hidden',
   },
-
-  // Sport bar
   sportBar: {
     display: 'flex',
     background: '#0d1b2e',
     borderBottom: '1px solid #1e3a5f',
     flexShrink: 0,
   },
-  sportBtn: {
+  btn: {
     flex: 1,
     display: 'flex',
     flexDirection: 'column',
@@ -111,38 +121,14 @@ const s = {
     padding: '8px 4px',
     background: 'none',
     border: 'none',
-    borderBottom: '2px solid transparent',
     cursor: 'pointer',
     fontFamily: 'inherit',
     transition: 'color 0.15s',
   },
-
-  // Map
   mapWrap: {
     flex: 1,
     position: 'relative',
-    overflow: 'hidden',
   },
-
-  // Floating ranking button
-  rankingBtn: {
-    position: 'absolute',
-    bottom: 16,
-    right: 12,
-    zIndex: 1000,
-    background: 'rgba(10,22,40,0.88)',
-    border: '1px solid #1e3a5f',
-    borderRadius: 8,
-    color: '#94a3b8',
-    fontSize: 13,
-    fontWeight: 600,
-    padding: '7px 14px',
-    cursor: 'pointer',
-    fontFamily: 'inherit',
-    backdropFilter: 'blur(6px)',
-  },
-
-  // Ranking drawer
   backdrop: {
     position: 'fixed',
     inset: 0,
@@ -162,7 +148,7 @@ const s = {
     display: 'flex',
     flexDirection: 'column',
   },
-  drawerHandle: {
+  handle: {
     width: 36,
     height: 4,
     background: '#1e3a5f',

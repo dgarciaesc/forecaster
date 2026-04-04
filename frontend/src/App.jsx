@@ -57,7 +57,7 @@ export default function App() {
     setModalSpot(spot)
   }
 
-  const mapContent = (
+  const mapOnly = (
     <>
       {error ? (
         <div style={styles.errorBox}>Error cargando datos: {error}</div>
@@ -69,9 +69,6 @@ export default function App() {
         />
       )}
       <HeatmapToggle active={showHeatmap} onChange={setShowHeatmap} />
-      {modalSpot && (
-        <WindguruModal spot={modalSpot} sport={sport} onClose={() => setModalSpot(null)} />
-      )}
     </>
   )
 
@@ -87,11 +84,24 @@ export default function App() {
           selected={selected}
           onSelect={setSelected}
         >
-          {mapContent}
+          {mapOnly}
         </MobileLayout>
+        {/* Modal rendered at root level so it's never clipped */}
+        {modalSpot && (
+          <WindguruModal spot={modalSpot} sport={sport} onClose={() => setModalSpot(null)} />
+        )}
       </div>
     )
   }
+
+  const mapContent = (
+    <>
+      {mapOnly}
+      {modalSpot && (
+        <WindguruModal spot={modalSpot} sport={sport} onClose={() => setModalSpot(null)} />
+      )}
+    </>
+  )
 
   return (
     <div style={styles.shell}>
