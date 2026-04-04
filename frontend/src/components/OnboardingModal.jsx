@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-const STORAGE_KEY = 'forecaster_onboarded'
+const STORAGE_KEY = 'wavepulse_onboarded'
 
 const STEPS = [
   {
@@ -48,7 +48,7 @@ export default function OnboardingModal() {
             <div style={s.radarSweep} />
             <div style={s.radarDot} />
           </div>
-          <span style={s.appName}>FORECASTER</span>
+          <span style={s.appName}>WAVEPULSE</span>
         </div>
 
         {/* Step content */}

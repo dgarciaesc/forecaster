@@ -30,7 +30,7 @@ export default function LoginScreen({ onLogin }) {
             <circle cx="13" cy="43" r="1"   fill="#eab308" fillOpacity="0.6" />
             <circle cx="16" cy="44" r="1"   fill="#eab308" fillOpacity="0.6" />
           </svg>
-          <span style={s.appName}>FORECASTER</span>
+          <span style={s.appName}>WAVEPULSE</span>
         </div>
 
         <p style={s.tagline}>Previsión de surf · España, Portugal &amp; Canarias</p>

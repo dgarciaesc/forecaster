@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react'
 import { MapContainer, TileLayer, CircleMarker, Tooltip, useMap, useMapEvents } from 'react-leaflet'
 import HeatmapLayer, { daysToRGB } from './HeatmapLayer'
+import FlowLayer from './FlowLayer'
 import SpotInfoCard from './SpotInfoCard'
 import { useMobile } from '../hooks/useMobile'
 
@@ -203,6 +204,10 @@ export default function MapView({ spots, seaPoints = [], sport, selected, onSele
 
         {showHeatmap && spots.length > 0 && (
           <HeatmapLayer spots={[...spots, ...seaPoints]} sport={sport} opacity={0.55} selectedDay={selectedDay} />
+        )}
+
+        {spots.length > 0 && (
+          <FlowLayer spots={spots} seaPoints={seaPoints} sport={sport} selectedDay={selectedDay} />
         )}
 
         {selected && <FlyTo spot={selected} />}

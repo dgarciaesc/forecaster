@@ -12,7 +12,7 @@ import MobileSpotSheet from './components/MobileSpotSheet'
 import OnboardingModal from './components/OnboardingModal'
 import { useMobile } from './hooks/useMobile'
 
-const TOKEN_KEY = 'forecaster_token'
+const TOKEN_KEY = 'wavepulse_token'
 const AUTH_ENABLED = import.meta.env.VITE_AUTH_ENABLED === 'true'
 
 export default function App() {

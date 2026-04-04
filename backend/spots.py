@@ -115,4 +115,36 @@ SEA_POINTS = [
     {"id": 133, "lat": 32.0, "lon": -20.0, "coast_facing": 270},
     {"id": 134, "lat": 30.5, "lon": -22.0, "coast_facing": 270},
     {"id": 135, "lat": 26.0, "lon": -19.0, "coast_facing": 270},
+    # Cantabrian Sea — close to north Spain coast
+    {"id": 136, "lat": 43.8, "lon":  -1.6, "coast_facing": 0},
+    {"id": 137, "lat": 43.9, "lon":  -3.5, "coast_facing": 0},
+    {"id": 138, "lat": 44.1, "lon":  -5.6, "coast_facing": 0},
+    {"id": 139, "lat": 44.2, "lon":  -7.8, "coast_facing": 0},
+    # Atlantic Galicia — west coast close-in
+    {"id": 140, "lat": 43.2, "lon":  -9.8, "coast_facing": 270},
+    {"id": 141, "lat": 42.3, "lon": -10.0, "coast_facing": 270},
+    {"id": 142, "lat": 41.4, "lon":  -9.7, "coast_facing": 270},
+    # Portuguese Atlantic coast close-in
+    {"id": 143, "lat": 40.0, "lon": -10.0, "coast_facing": 270},
+    {"id": 144, "lat": 38.4, "lon": -10.4, "coast_facing": 270},
+    {"id": 145, "lat": 37.0, "lon":  -9.6, "coast_facing": 225},
+    # Gulf of Cádiz / Andalucía Atlantic
+    {"id": 146, "lat": 35.9, "lon":  -7.5, "coast_facing": 225},
+    {"id": 147, "lat": 36.4, "lon":  -4.2, "coast_facing": 180},
+    # Mediterranean — Catalan coast close-in
+    {"id": 148, "lat": 41.5, "lon":   1.8, "coast_facing": 90},
+    {"id": 149, "lat": 40.4, "lon":   0.6, "coast_facing": 90},
+    # Mediterranean — Valencia / Alicante close-in
+    {"id": 150, "lat": 39.3, "lon":   0.1, "coast_facing": 90},
+    {"id": 151, "lat": 38.0, "lon":   0.6, "coast_facing": 90},
+    {"id": 152, "lat": 37.4, "lon":   1.7, "coast_facing": 90},
+    # Canary Islands — near island waters
+    {"id": 153, "lat": 28.6, "lon": -15.6, "coast_facing": 270},
+    {"id": 154, "lat": 28.1, "lon": -16.7, "coast_facing": 270},
+    {"id": 155, "lat": 29.1, "lon": -13.6, "coast_facing": 270},
+    # Islas Baleares
+    {"id": 156, "lat": 40.0, "lon":   3.1, "coast_facing":  0},   # norte de Mallorca
+    {"id": 157, "lat": 38.7, "lon":   1.0, "coast_facing": 270},  # oeste de Ibiza
+    # El Cotillo, Fuerteventura
+    {"id": 158, "lat": 28.7, "lon": -14.1, "coast_facing": 270},
 ]

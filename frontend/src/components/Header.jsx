@@ -8,7 +8,7 @@ function RadarLogo() {
         <div style={logo.sweep} />
         <div style={logo.dot} />
       </div>
-      <span style={logo.text}>FORECASTER</span>
+      <span style={logo.text}>WAVEPULSE</span>
     </div>
   )
 }

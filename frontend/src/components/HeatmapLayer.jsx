@@ -47,7 +47,7 @@ function idw(pts, lat, lon, power = 2.5) {
 let _landGeoJSON = null
 let _landFetchPromise = null
 
-function getLandGeoJSON() {
+export function getLandGeoJSON() {
   if (_landGeoJSON) return Promise.resolve(_landGeoJSON)
   if (_landFetchPromise) return _landFetchPromise
   _landFetchPromise = fetch(
@@ -100,8 +100,8 @@ function topoToGeo(topo) {
   return { type: 'FeatureCollection', features }
 }
 
-// Draw land polygons onto ctx using destination-out (erases heatmap over land)
-function maskLand(ctx, map, landGeoJSON) {
+// Draw land polygons onto ctx using destination-out (erases content over land)
+export function maskLand(ctx, map, landGeoJSON) {
   const bounds = map.getBounds().pad(0.1)
 
   ctx.save()
