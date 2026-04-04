@@ -9,48 +9,37 @@ const SPORTS = [
   { id: 'kitesurf', label: 'Kitesurf', Icon: KitesurfIcon, color: 'var(--kitesurf)' },
 ]
 
-// ── Bottom sport bar ──────────────────────────────────────────────────────────
-function SportBar({ sport, onChange, onToggleRanking, rankingOpen }) {
+function SportBar({ sport, onChange }) {
   return (
-    <div style={s.bar}>
+    <div style={s.sportBar}>
       {SPORTS.map(({ id, label, Icon, color }) => {
         const active = sport === id
         return (
           <button
             key={id}
             onClick={() => onChange(id)}
-            style={{ ...s.barBtn, color: active ? color : 'var(--muted)' }}
+            style={{
+              ...s.sportBtn,
+              color: active ? color : 'var(--muted)',
+              borderBottom: active ? `2px solid ${color}` : '2px solid transparent',
+            }}
           >
-            <span style={active ? { filter: `drop-shadow(0 0 4px ${color})` } : {}}>
-              <Icon size={22} />
+            <span style={active ? { filter: `drop-shadow(0 0 3px ${color})` } : {}}>
+              <Icon size={20} />
             </span>
-            <span style={{ ...s.barLabel, fontWeight: active ? 700 : 400 }}>{label}</span>
-            {active && <div style={{ ...s.activeLine, background: color }} />}
+            <span style={{ fontSize: 11, fontWeight: active ? 700 : 400 }}>{label}</span>
           </button>
         )
       })}
-
-      {/* Ranking toggle */}
-      <button
-        onClick={onToggleRanking}
-        style={{ ...s.barBtn, color: rankingOpen ? '#e2e8f0' : 'var(--muted)' }}
-      >
-        <span style={{ fontSize: 20, lineHeight: 1 }}>☰</span>
-        <span style={s.barLabel}>Ranking</span>
-        {rankingOpen && <div style={{ ...s.activeLine, background: '#e2e8f0' }} />}
-      </button>
     </div>
   )
 }
 
-// ── Ranking drawer ────────────────────────────────────────────────────────────
 function RankingDrawer({ open, spots, sport, selected, onSelect, onClose }) {
   if (!open) return null
   return (
     <>
-      {/* Backdrop */}
       <div onClick={onClose} style={s.backdrop} />
-      {/* Drawer */}
       <div style={s.drawer}>
         <div style={s.drawerHandle} />
         <div style={s.drawerTitle}>Ranking · 7 días</div>
@@ -67,30 +56,24 @@ function RankingDrawer({ open, spots, sport, selected, onSelect, onClose }) {
   )
 }
 
-// ── Mobile layout wrapper ─────────────────────────────────────────────────────
-export default function MobileLayout({
-  sport, onSportChange,
-  spots, selected, onSelect,
-  children,   // map + overlays
-}) {
+export default function MobileLayout({ sport, onSportChange, spots, selected, onSelect, children }) {
   const [rankingOpen, setRankingOpen] = useState(false)
 
   return (
     <div style={s.root}>
-      {/* Map fills all space */}
+      {/* Sport selector above the map */}
+      <SportBar sport={sport} onChange={id => { onSportChange(id); setRankingOpen(false) }} />
+
+      {/* Map fills remaining space */}
       <div style={s.mapWrap}>
         {children}
+
+        {/* Floating ranking button */}
+        <button style={s.rankingBtn} onClick={() => setRankingOpen(v => !v)}>
+          ☰ Ranking
+        </button>
       </div>
 
-      {/* Bottom sport bar */}
-      <SportBar
-        sport={sport}
-        onChange={id => { onSportChange(id); setRankingOpen(false) }}
-        onToggleRanking={() => setRankingOpen(v => !v)}
-        rankingOpen={rankingOpen}
-      />
-
-      {/* Ranking slide-up drawer */}
       <RankingDrawer
         open={rankingOpen}
         spots={spots}
@@ -109,49 +92,57 @@ const s = {
     flexDirection: 'column',
     flex: 1,
     overflow: 'hidden',
-    position: 'relative',
-  },
-  mapWrap: {
-    flex: 1,
-    position: 'relative',
-    overflow: 'hidden',
   },
 
   // Sport bar
-  bar: {
+  sportBar: {
     display: 'flex',
     background: '#0d1b2e',
-    borderTop: '1px solid #1e3a5f',
+    borderBottom: '1px solid #1e3a5f',
     flexShrink: 0,
   },
-  barBtn: {
+  sportBtn: {
     flex: 1,
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 3,
-    padding: '10px 4px 8px',
+    padding: '8px 4px',
     background: 'none',
     border: 'none',
+    borderBottom: '2px solid transparent',
     cursor: 'pointer',
-    position: 'relative',
     fontFamily: 'inherit',
-  },
-  barLabel: {
-    fontSize: 10,
-    letterSpacing: '0.02em',
-  },
-  activeLine: {
-    position: 'absolute',
-    top: 0,
-    left: '20%',
-    right: '20%',
-    height: 2,
-    borderRadius: 2,
+    transition: 'color 0.15s',
   },
 
-  // Drawer
+  // Map
+  mapWrap: {
+    flex: 1,
+    position: 'relative',
+    overflow: 'hidden',
+  },
+
+  // Floating ranking button
+  rankingBtn: {
+    position: 'absolute',
+    bottom: 16,
+    right: 12,
+    zIndex: 1000,
+    background: 'rgba(10,22,40,0.88)',
+    border: '1px solid #1e3a5f',
+    borderRadius: 8,
+    color: '#94a3b8',
+    fontSize: 13,
+    fontWeight: 600,
+    padding: '7px 14px',
+    cursor: 'pointer',
+    fontFamily: 'inherit',
+    backdropFilter: 'blur(6px)',
+  },
+
+  // Ranking drawer
   backdrop: {
     position: 'fixed',
     inset: 0,
@@ -163,7 +154,7 @@ const s = {
     bottom: 0,
     left: 0,
     right: 0,
-    height: '60vh',
+    height: '65vh',
     background: '#111e35',
     borderTop: '1px solid #1e3a5f',
     borderRadius: '16px 16px 0 0',

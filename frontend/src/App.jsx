@@ -78,7 +78,6 @@ export default function App() {
   if (mobile) {
     return (
       <div style={styles.shell}>
-        <RotatePrompt />
         <OnboardingModal />
         <Header spots={spots} onSelectSpot={handleSearchSelect} onLogout={handleLogout} mobile />
         <MobileLayout
