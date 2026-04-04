@@ -302,6 +302,19 @@ const SPOT_INFO = {
     bestConditions: 'Viento Alisio del NE constante, 15–30 nudos',
     description: 'Playa de aguas planas y viento Alisio constante: el spot perfecto para kitesurf y windsurf. Sede del Campeonato del Mundo de Kitesurf. Sin ola significativa, puro viento.',
   },
+  // ── Baleares ──────────────────────────────────────────────────────────────────
+  49: {
+    bottom: 'Arena y roca',
+    waveType: 'Beach break / reef break',
+    bestConditions: 'Mar del NE 1–2 m, viento del SW (offshore)',
+    description: 'Cala virgen en el noreste de Mallorca, una de las pocas playas con ola real en las islas. Con Tramontana o Gregal hay surf decente. Entorno natural protegido, acceso por pista de tierra.',
+  },
+  50: {
+    bottom: 'Arena',
+    waveType: 'Beach break',
+    bestConditions: 'Mar del S 0.8–1.5 m, viento del N (offshore); también kitesurf con Tramontana',
+    description: 'Playa extensa en la costa sur de Menorca con el mayor fetch del Mediterráneo hacia el S-SE. Con viento del sur hay ola consistente para la zona. En invierno la Tramontana crea condiciones de windsurf y kitesurf.',
+  },
 }
 
 export default SPOT_INFO

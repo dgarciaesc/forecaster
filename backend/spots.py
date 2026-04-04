@@ -65,6 +65,9 @@ SPOTS = [
     {"id": 46, "name": "Famara",            "region": "Lanzarote",  "lat": 29.1167, "lon":-13.5667, "coast_facing": 285},
     {"id": 47, "name": "El Cotillo",        "region": "Fuerteventura","lat": 28.6833,"lon":-14.0167, "coast_facing": 280},
     {"id": 48, "name": "Sotavento",         "region": "Fuerteventura","lat": 28.1167,"lon":-14.2500, "coast_facing": 130},
+    # Baleares
+    {"id": 49, "name": "Cala Mesquida",     "region": "Mallorca",     "lat": 39.7264, "lon":  3.4617, "coast_facing":  45},
+    {"id": 50, "name": "Son Bou",           "region": "Menorca",      "lat": 39.8764, "lon":  3.9972, "coast_facing": 185},
 ]
 
 # Virtual sea points — used only for heatmap interpolation, not shown as markers/ranking
