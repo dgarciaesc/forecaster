@@ -4,6 +4,7 @@ import { useMobile } from '../hooks/useMobile'
 export default function SpotInfoCard({ spot, onClose }) {
   const mobile = useMobile()
   if (!spot) return null
+  if (mobile) return null
   const info = SPOT_INFO[spot.id]
   if (!info) return null
 

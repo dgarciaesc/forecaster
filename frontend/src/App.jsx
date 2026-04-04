@@ -8,6 +8,7 @@ import Header from './components/Header'
 import LoginScreen from './components/LoginScreen'
 import MobileLayout from './components/MobileLayout'
 import RotatePrompt from './components/RotatePrompt'
+import MobileSpotSheet from './components/MobileSpotSheet'
 import OnboardingModal from './components/OnboardingModal'
 import { useMobile } from './hooks/useMobile'
 
@@ -95,7 +96,7 @@ export default function App() {
         >
           {mapOnly}
         </MobileLayout>
-        {modal}
+        {modalSpot && <MobileSpotSheet spot={modalSpot} sport={sport} onClose={() => setModalSpot(null)} />}
       </div>
     )
   }
