@@ -1,12 +1,18 @@
 import SPOT_INFO from '../data/spotInfo'
+import { useMobile } from '../hooks/useMobile'
 
 export default function SpotInfoCard({ spot, onClose }) {
+  const mobile = useMobile()
   if (!spot) return null
   const info = SPOT_INFO[spot.id]
   if (!info) return null
 
+  const cardStyle = mobile
+    ? { ...s.card, top: 'auto', bottom: 70, left: 10, right: 10, maxWidth: '100%' }
+    : s.card
+
   return (
-    <div style={s.card}>
+    <div style={cardStyle}>
       <button onClick={onClose} style={s.close} title="Cerrar">✕</button>
 
       <div style={s.name}>{spot.name}</div>

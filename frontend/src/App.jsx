@@ -5,6 +5,8 @@ import SportSelector from './components/SportSelector'
 import WindguruModal from './components/WindguruModal'
 import Header from './components/Header'
 import LoginScreen from './components/LoginScreen'
+import MobileLayout from './components/MobileLayout'
+import { useMobile } from './hooks/useMobile'
 
 const TOKEN_KEY = 'forecaster_token'
 const AUTH_ENABLED = import.meta.env.VITE_AUTH_ENABLED === 'true'
@@ -46,16 +48,52 @@ export default function App() {
 
   if (AUTH_ENABLED && !token) return <LoginScreen onLogin={handleLogin} />
 
+  const mobile = useMobile()
+
   function handleSearchSelect(spot) {
     setSelected(spot)
     setModalSpot(spot)
+  }
+
+  const mapContent = (
+    <>
+      {error ? (
+        <div style={styles.errorBox}>Error cargando datos: {error}</div>
+      ) : (
+        <MapView
+          spots={spots} seaPoints={seaPoints} sport={sport}
+          selected={selected} onSelect={setSelected}
+          onOpenModal={setModalSpot} showHeatmap={showHeatmap}
+        />
+      )}
+      <HeatmapToggle active={showHeatmap} onChange={setShowHeatmap} />
+      {modalSpot && (
+        <WindguruModal spot={modalSpot} sport={sport} onClose={() => setModalSpot(null)} />
+      )}
+    </>
+  )
+
+  if (mobile) {
+    return (
+      <div style={styles.shell}>
+        <Header spots={spots} onSelectSpot={handleSearchSelect} onLogout={handleLogout} mobile />
+        <MobileLayout
+          sport={sport}
+          onSportChange={s => { setSport(s); setSelected(null) }}
+          spots={spots}
+          selected={selected}
+          onSelect={setSelected}
+        >
+          {mapContent}
+        </MobileLayout>
+      </div>
+    )
   }
 
   return (
     <div style={styles.shell}>
     <Header spots={spots} onSelectSpot={handleSearchSelect} onLogout={handleLogout} />
     <div style={styles.root}>
-      {/* LEFT – Ranking */}
       <aside style={styles.left}>
         <div style={styles.panelHeader}>
           <span style={styles.panelTitle}>Ranking · 7 días</span>
@@ -64,22 +102,9 @@ export default function App() {
         <Ranking spots={spots} sport={sport} selected={selected} onSelect={setSelected} />
       </aside>
 
-      {/* CENTER – Map */}
       <main style={styles.center}>
-        {error ? (
-          <div style={styles.errorBox}>
-            Error cargando datos: {error}
-          </div>
-        ) : (
-          <MapView spots={spots} seaPoints={seaPoints} sport={sport} selected={selected} onSelect={setSelected} onOpenModal={setModalSpot} showHeatmap={showHeatmap} />
-        )}
-        <HeatmapToggle active={showHeatmap} onChange={setShowHeatmap} />
+        {mapContent}
       </main>
-
-      {/* RIGHT – Sport selector */}
-      {modalSpot && (
-        <WindguruModal spot={modalSpot} sport={sport} onClose={() => setModalSpot(null)} />
-      )}
 
       <aside style={styles.right}>
         <div style={styles.panelHeader}>

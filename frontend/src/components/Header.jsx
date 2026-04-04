@@ -211,13 +211,15 @@ const search = {
 }
 
 // ── Header ────────────────────────────────────────────────────────────────────
-export default function Header({ spots, onSelectSpot, onLogout }) {
+export default function Header({ spots, onSelectSpot, onLogout, mobile }) {
   return (
     <header style={hdr.wrap}>
       <div style={hdr.left}><RadarLogo /></div>
-      <div style={hdr.center}>
-        <SpotSearch spots={spots} onSelectSpot={onSelectSpot} />
-      </div>
+      {!mobile && (
+        <div style={hdr.center}>
+          <SpotSearch spots={spots} onSelectSpot={onSelectSpot} />
+        </div>
+      )}
       <div style={hdr.right}>
         {onLogout && (
           <button onClick={onLogout} style={hdr.logoutBtn} title="Cerrar sesión">
