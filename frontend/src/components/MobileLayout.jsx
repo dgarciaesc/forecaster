@@ -9,7 +9,7 @@ const SPORTS = [
   { id: 'kitesurf', label: 'Kitesurf', Icon: KitesurfIcon, color: 'var(--kitesurf)' },
 ]
 
-function SportBar({ sport, onChange, onToggleRanking, rankingOpen }) {
+function SportBar({ sport, onChange, onToggleRanking, rankingOpen, level, onLevelChange }) {
   return (
     <div style={s.sportBar}>
       {SPORTS.map(({ id, label, Icon, color }) => {
@@ -22,12 +22,31 @@ function SportBar({ sport, onChange, onToggleRanking, rankingOpen }) {
               ...s.btn,
               color: active ? color : 'var(--muted)',
               borderBottom: active ? `2px solid ${color}` : '2px solid transparent',
+              position: 'relative',
             }}
           >
             <span style={active ? { filter: `drop-shadow(0 0 3px ${color})` } : {}}>
               <Icon size={20} />
             </span>
             <span style={{ fontSize: 11, fontWeight: active ? 700 : 400 }}>{label}</span>
+            {active && (
+              <span
+                onClick={e => { e.stopPropagation(); onLevelChange(level === 'beginner' ? 'expert' : 'beginner') }}
+                style={{
+                  fontSize: 9,
+                  fontWeight: 700,
+                  color,
+                  background: `${color}22`,
+                  border: `1px solid ${color}66`,
+                  borderRadius: 4,
+                  padding: '1px 4px',
+                  lineHeight: 1.4,
+                  cursor: 'pointer',
+                }}
+              >
+                {level === 'beginner' ? '🌊' : '⚡'}
+              </span>
+            )}
           </button>
         )
       })}
@@ -49,7 +68,7 @@ function SportBar({ sport, onChange, onToggleRanking, rankingOpen }) {
   )
 }
 
-function RankingDrawer({ open, spots, sport, selected, onSelect, onClose }) {
+function RankingDrawer({ open, spots, effectiveSport, selected, onSelect, onClose }) {
   if (!open) return null
   return (
     <>
@@ -60,7 +79,7 @@ function RankingDrawer({ open, spots, sport, selected, onSelect, onClose }) {
         <div style={s.drawerScroll}>
           <Ranking
             spots={spots}
-            sport={sport}
+            sport={effectiveSport}
             selected={selected}
             onSelect={spot => { onSelect(spot); onClose() }}
           />
@@ -70,7 +89,7 @@ function RankingDrawer({ open, spots, sport, selected, onSelect, onClose }) {
   )
 }
 
-export default function MobileLayout({ sport, onSportChange, spots, selected, onSelect, children }) {
+export default function MobileLayout({ sport, onSportChange, level, onLevelChange, spots, selected, onSelect, effectiveSport, children }) {
   const [rankingOpen, setRankingOpen] = useState(false)
 
   return (
@@ -80,6 +99,8 @@ export default function MobileLayout({ sport, onSportChange, spots, selected, on
         onChange={id => { onSportChange(id); setRankingOpen(false) }}
         onToggleRanking={() => setRankingOpen(v => !v)}
         rankingOpen={rankingOpen}
+        level={level}
+        onLevelChange={onLevelChange}
       />
 
       <div style={s.mapWrap}>
@@ -89,7 +110,7 @@ export default function MobileLayout({ sport, onSportChange, spots, selected, on
       <RankingDrawer
         open={rankingOpen}
         spots={spots}
-        sport={sport}
+        effectiveSport={effectiveSport}
         selected={selected}
         onSelect={onSelect}
         onClose={() => setRankingOpen(false)}

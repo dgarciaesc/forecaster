@@ -7,7 +7,7 @@ const SPORTS = [
   { id: 'kitesurf', label: 'Kitesurf',  Icon: KitesurfIcon, color: 'var(--kitesurf)' },
 ]
 
-export default function SportSelector({ sport, onChange }) {
+export default function SportSelector({ sport, onChange, level, onLevelChange }) {
   return (
     <div style={styles.container}>
       {SPORTS.map(({ id, label, Icon, color }) => {
@@ -20,15 +20,45 @@ export default function SportSelector({ sport, onChange }) {
               ...styles.btn,
               borderColor: active ? color : 'var(--border)',
               background: active ? `${color}22` : 'transparent',
+              alignItems: active ? 'flex-start' : 'center',
             }}
           >
-            <span style={{ color: active ? color : 'var(--muted)', flexShrink: 0 }}>
-              <Icon size={30} />
-            </span>
-            <span style={{ ...styles.label, color: active ? color : 'var(--muted)' }}>
-              {label}
-            </span>
-            {active && <div style={{ ...styles.activeDot, background: color }} />}
+            <div style={styles.btnTop}>
+              <span style={{ color: active ? color : 'var(--muted)', flexShrink: 0 }}>
+                <Icon size={30} />
+              </span>
+              <span style={{ ...styles.label, color: active ? color : 'var(--muted)' }}>
+                {label}
+              </span>
+              {active && <div style={{ ...styles.activeDot, background: color }} />}
+            </div>
+
+            {active && (
+              <div style={styles.levelRow} onClick={e => e.stopPropagation()}>
+                <button
+                  onClick={() => onLevelChange('beginner')}
+                  style={{
+                    ...styles.levelBtn,
+                    background: level === 'beginner' ? `${color}33` : 'transparent',
+                    color: level === 'beginner' ? color : 'var(--muted)',
+                    borderColor: level === 'beginner' ? color : '#1e3a5f',
+                  }}
+                >
+                  🌊 Principiante
+                </button>
+                <button
+                  onClick={() => onLevelChange('expert')}
+                  style={{
+                    ...styles.levelBtn,
+                    background: level === 'expert' ? `${color}33` : 'transparent',
+                    color: level === 'expert' ? color : 'var(--muted)',
+                    borderColor: level === 'expert' ? color : '#1e3a5f',
+                  }}
+                >
+                  ⚡ Experto
+                </button>
+              </div>
+            )}
           </button>
         )
       })}
@@ -45,14 +75,19 @@ const styles = {
   },
   btn: {
     display: 'flex',
-    alignItems: 'center',
-    gap: 10,
+    flexDirection: 'column',
+    gap: 8,
     padding: '10px 12px',
     borderRadius: 10,
     border: '1px solid',
     cursor: 'pointer',
     transition: 'all 0.15s ease',
-    position: 'relative',
+  },
+  btnTop: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 10,
+    width: '100%',
   },
   label: {
     flex: 1,
@@ -65,5 +100,21 @@ const styles = {
     height: 7,
     borderRadius: '50%',
     flexShrink: 0,
+  },
+  levelRow: {
+    display: 'flex',
+    gap: 6,
+    width: '100%',
+  },
+  levelBtn: {
+    flex: 1,
+    padding: '5px 0',
+    borderRadius: 6,
+    border: '1px solid',
+    cursor: 'pointer',
+    fontSize: 11,
+    fontWeight: 600,
+    fontFamily: 'inherit',
+    transition: 'all 0.15s ease',
   },
 }

@@ -140,13 +140,127 @@ def _score_kitesurf(wind_kn: float, wave_height: float) -> float:
     return round(0.70 * ws_s + 0.30 * wh_s, 1)
 
 
+# ── Beginner scoring functions ─────────────────────────────────────────────────
+
+def _score_surf_beginner(wave_height: float, wave_period: float,
+                         wind_kn: float, wind_dir: float = 0, coast_facing: float = 0) -> float:
+    # Wave height (40%) — smaller waves are ideal
+    wh = wave_height
+    if wh < 0.2:        wh_s = 0
+    elif wh < 0.4:      wh_s = 40
+    elif wh < 0.7:      wh_s = 80
+    elif wh < 1.0:      wh_s = 100
+    elif wh < 1.5:      wh_s = 60
+    elif wh < 2.0:      wh_s = 20
+    else:               wh_s = 0
+
+    # Wave period (35%) — medium periods ok
+    wp = wave_period
+    if wp < 5:          wp_s = 10
+    elif wp < 7:        wp_s = 50
+    elif wp < 10:       wp_s = 90
+    elif wp < 14:       wp_s = 100
+    else:               wp_s = 85
+
+    # Wind (25%) — lighter wind preferred
+    diff = _wind_angle_diff(wind_dir, coast_facing)
+    ws = wind_kn
+    if diff < 60:           # Offshore
+        if ws < 3:   ws_s = 70
+        elif ws < 6: ws_s = 100
+        elif ws < 10: ws_s = 70
+        elif ws < 15: ws_s = 30
+        else:        ws_s = 0
+    elif diff < 120:        # Cross-shore
+        if ws < 3:   ws_s = 70
+        elif ws < 6: ws_s = 50
+        elif ws < 10: ws_s = 20
+        else:        ws_s = 0
+    else:                   # Onshore
+        if ws < 3:   ws_s = 40
+        elif ws < 6: ws_s = 10
+        else:        ws_s = 0
+
+    return round(0.40 * wh_s + 0.35 * wp_s + 0.25 * ws_s, 1)
+
+
+def _score_windsurf_beginner(wind_kn: float, wave_height: float) -> float:
+    # Wind (70%) — lower range, steady winds
+    ws = wind_kn
+    if ws < 5:          ws_s = 0
+    elif ws < 8:        ws_s = 30
+    elif ws < 12:       ws_s = 90
+    elif ws < 18:       ws_s = 100
+    elif ws < 22:       ws_s = 60
+    elif ws < 28:       ws_s = 20
+    else:               ws_s = 0
+
+    # Wave height (30%) — flat/small water preferred
+    wh = wave_height
+    if wh < 0.5:        wh_s = 100
+    elif wh < 1.0:      wh_s = 80
+    elif wh < 1.5:      wh_s = 40
+    elif wh < 2.5:      wh_s = 10
+    else:               wh_s = 0
+
+    return round(0.70 * ws_s + 0.30 * wh_s, 1)
+
+
+def _score_wingfoil_beginner(wind_kn: float, wave_height: float) -> float:
+    # Wind (80%) — lighter, consistent wind
+    ws = wind_kn
+    if ws < 8:          ws_s = 0
+    elif ws < 10:       ws_s = 40
+    elif ws < 14:       ws_s = 100
+    elif ws < 18:       ws_s = 90
+    elif ws < 22:       ws_s = 50
+    elif ws < 28:       ws_s = 15
+    else:               ws_s = 0
+
+    # Wave height (20%) — flat/small water preferred
+    wh = wave_height
+    if wh < 0.5:        wh_s = 100
+    elif wh < 1.0:      wh_s = 75
+    elif wh < 1.5:      wh_s = 35
+    elif wh < 2.5:      wh_s = 10
+    else:               wh_s = 0
+
+    return round(0.80 * ws_s + 0.20 * wh_s, 1)
+
+
+def _score_kitesurf_beginner(wind_kn: float, wave_height: float) -> float:
+    # Wind (70%) — lower range
+    ws = wind_kn
+    if ws < 8:          ws_s = 0
+    elif ws < 10:       ws_s = 30
+    elif ws < 15:       ws_s = 90
+    elif ws < 20:       ws_s = 100
+    elif ws < 25:       ws_s = 55
+    elif ws < 30:       ws_s = 15
+    else:               ws_s = 0
+
+    # Wave height (30%) — flat/small water preferred
+    wh = wave_height
+    if wh < 0.5:        wh_s = 100
+    elif wh < 1.0:      wh_s = 75
+    elif wh < 1.5:      wh_s = 40
+    elif wh < 2.5:      wh_s = 10
+    else:               wh_s = 0
+
+    return round(0.70 * ws_s + 0.30 * wh_s, 1)
+
+
 def compute_scores(wh: float, wp: float, ws: float,
                    wind_dir: float, coast_facing: float) -> dict:
     return {
-        "surf":      _score_surf(wh, wp, ws, wind_dir, coast_facing),
-        "windsurf":  _score_windsurf(ws, wh),
-        "wingfoil":  _score_wingfoil(ws, wh),
-        "kitesurf":  _score_kitesurf(ws, wh),
+        "surf":               _score_surf(wh, wp, ws, wind_dir, coast_facing),
+        "surf_beginner":      _score_surf_beginner(wh, wp, ws, wind_dir, coast_facing),
+        "windsurf":           _score_windsurf(ws, wh),
+        "windsurf_beginner":  _score_windsurf_beginner(ws, wh),
+        "wingfoil":           _score_wingfoil(ws, wh),
+        "wingfoil_beginner":  _score_wingfoil_beginner(ws, wh),
+        "kitesurf":           _score_kitesurf(ws, wh),
+        "kitesurf_beginner":  _score_kitesurf_beginner(ws, wh),
     }
 
 # Keep for backwards compat (used in summarize)
@@ -226,6 +340,9 @@ def _daytime_avg(times: list[str], values: list, hours=(8, 20)) -> dict[str, flo
 
 def build_hourly_forecast(raw: dict, coast_facing: float = 0) -> list[dict]:
     """3-hourly data for the Windguru-style popup."""
+    from datetime import date as date_cls
+    today = date_cls.today().isoformat()
+
     marine  = raw["marine"]["hourly"]
     weather = raw["weather"]["hourly"]
 
@@ -238,6 +355,8 @@ def build_hourly_forecast(raw: dict, coast_facing: float = 0) -> list[dict]:
     hours = []
     for t in marine["time"]:
         dt = datetime.fromisoformat(t)
+        if dt.date().isoformat() < today:
+            continue
         if dt.hour % 3 != 0:
             continue
         wh   = wave_h.get(t) or 0.0
@@ -260,6 +379,9 @@ def build_hourly_forecast(raw: dict, coast_facing: float = 0) -> list[dict]:
 
 
 def build_daily_forecast(raw: dict, coast_facing: float = 0) -> list[dict]:
+    from datetime import date as date_cls
+    today = date_cls.today().isoformat()
+
     marine  = raw["marine"]["hourly"]
     weather = raw["weather"]["hourly"]
 
@@ -272,7 +394,7 @@ def build_daily_forecast(raw: dict, coast_facing: float = 0) -> list[dict]:
     wind_s  = _daytime_avg(times_w, weather["windspeed_10m"])
     wind_d  = _daytime_avg(times_w, weather["winddirection_10m"])
 
-    dates = sorted(set(wave_h) & set(wave_p) & set(wind_s))
+    dates = sorted(d for d in (set(wave_h) & set(wave_p) & set(wind_s)) if d >= today)
 
     days = []
     for date in dates:
@@ -298,7 +420,8 @@ def build_daily_forecast(raw: dict, coast_facing: float = 0) -> list[dict]:
 
 
 def summarize(days: list[dict]) -> dict:
-    sports = ["surf", "windsurf", "wingfoil", "kitesurf"]
+    sports = ["surf", "windsurf", "wingfoil", "kitesurf",
+              "surf_beginner", "windsurf_beginner", "wingfoil_beginner", "kitesurf_beginner"]
     result = {}
     for sport in sports:
         day_scores = [d["scores"][sport] for d in days]

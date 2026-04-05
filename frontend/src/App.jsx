@@ -18,6 +18,7 @@ const AUTH_ENABLED = import.meta.env.VITE_AUTH_ENABLED === 'true'
 export default function App() {
   const [token, setToken] = useState(() => AUTH_ENABLED ? localStorage.getItem(TOKEN_KEY) : 'no-auth')
   const [sport, setSport] = useState('surf')
+  const [level, setLevel] = useState('expert')
   const [spots, setSpots] = useState([])
   const [seaPoints, setSeaPoints] = useState([])
   const [loading, setLoading] = useState(true)
@@ -53,6 +54,8 @@ export default function App() {
 
   if (AUTH_ENABLED && !token) return <LoginScreen onLogin={handleLogin} />
 
+  const effectiveSport = level === 'beginner' ? `${sport}_beginner` : sport
+
   const mobile = useMobile()
 
   function handleSearchSelect(spot) {
@@ -63,7 +66,7 @@ export default function App() {
   // Portal so the modal always renders on document.body — never clipped by overflow:hidden parents (iOS Safari bug)
   const modal = modalSpot
     ? createPortal(
-        <WindguruModal spot={modalSpot} sport={sport} onClose={() => setModalSpot(null)} />,
+        <WindguruModal spot={modalSpot} sport={effectiveSport} onClose={() => setModalSpot(null)} />,
         document.body
       )
     : null
@@ -74,7 +77,7 @@ export default function App() {
         <div style={styles.errorBox}>Error cargando datos: {error}</div>
       ) : (
         <MapView
-          spots={spots} seaPoints={seaPoints} sport={sport}
+          spots={spots} seaPoints={seaPoints} sport={effectiveSport}
           selected={selected} onSelect={setSelected}
           onOpenModal={setModalSpot} showHeatmap={showHeatmap}
           selectedDay={selectedDay}
@@ -93,13 +96,16 @@ export default function App() {
         <MobileLayout
           sport={sport}
           onSportChange={s => { setSport(s); setSelected(null) }}
+          level={level}
+          onLevelChange={setLevel}
           spots={spots}
           selected={selected}
           onSelect={setSelected}
+          effectiveSport={effectiveSport}
         >
           {mapOnly}
         </MobileLayout>
-        {modalSpot && <MobileSpotSheet spot={modalSpot} sport={sport} onClose={() => setModalSpot(null)} />}
+        {modalSpot && <MobileSpotSheet spot={modalSpot} sport={effectiveSport} onClose={() => setModalSpot(null)} />}
       </div>
     )
   }
@@ -116,7 +122,7 @@ export default function App() {
           <span style={styles.panelTitle}>Ranking · 7 días</span>
           {loading && <span style={styles.badge}>cargando…</span>}
         </div>
-        <Ranking spots={spots} sport={sport} selected={selected} onSelect={setSelected} />
+        <Ranking spots={spots} sport={effectiveSport} selected={selected} onSelect={setSelected} />
       </aside>
 
       <main style={styles.center}>
@@ -127,7 +133,7 @@ export default function App() {
         <div style={styles.panelHeader}>
           <span style={styles.panelTitle}>Deporte</span>
         </div>
-        <SportSelector sport={sport} onChange={s => { setSport(s); setSelected(null) }} />
+        <SportSelector sport={sport} onChange={s => { setSport(s); setSelected(null) }} level={level} onLevelChange={setLevel} />
         <Legend />
       </aside>
     </div>
