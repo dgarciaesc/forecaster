@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react'
-import { MapContainer, TileLayer, CircleMarker, Tooltip, useMap, useMapEvents } from 'react-leaflet'
+import { MapContainer, TileLayer, CircleMarker, Tooltip, useMap } from 'react-leaflet'
 import HeatmapLayer, { daysToRGB } from './HeatmapLayer'
 import FlowLayer from './FlowLayer'
 import SpotInfoCard from './SpotInfoCard'
@@ -155,27 +155,54 @@ function HoverMarker({ spot, color, accentColor, isSelected, onClick, qd }) {
 }
 
 // ── Mobile tap handler ────────────────────────────────────────────────────────
-// Leaflet SVG marker click events are unreliable on iOS. Instead we listen on
-// the map-level click event (which fires reliably on touch) and find the
-// nearest spot by pixel distance.
+// Leaflet's synthetic click event is unreliable on iOS Safari. We attach native
+// touchstart/touchend listeners directly to the map container so taps are
+// detected regardless of Leaflet's internal event pipeline.
 function MobileClickHandler({ spots, onSelect, onOpenModal }) {
   const map = useMap()
-  useMapEvents({
-    click(e) {
-      const clickPt = map.latLngToContainerPoint(e.latlng)
+
+  useEffect(() => {
+    const container = map.getContainer()
+    let startX = 0
+    let startY = 0
+
+    function onTouchStart(e) {
+      if (e.touches.length !== 1) return
+      startX = e.touches[0].clientX
+      startY = e.touches[0].clientY
+    }
+
+    function onTouchEnd(e) {
+      if (e.changedTouches.length !== 1) return
+      const touch = e.changedTouches[0]
+      // Ignore if the finger moved too much (pan gesture)
+      if (Math.hypot(touch.clientX - startX, touch.clientY - startY) > 10) return
+
+      const rect = container.getBoundingClientRect()
+      const x = touch.clientX - rect.left
+      const y = touch.clientY - rect.top
+
       let nearest = null
       let minDist = Infinity
       for (const spot of spots) {
         const sp = map.latLngToContainerPoint([spot.lat, spot.lon])
-        const d = Math.hypot(clickPt.x - sp.x, clickPt.y - sp.y)
+        const d = Math.hypot(x - sp.x, y - sp.y)
         if (d < minDist) { minDist = d; nearest = spot }
       }
       if (nearest && minDist < 40) {
         onSelect(nearest)
         onOpenModal(nearest)
       }
-    },
-  })
+    }
+
+    container.addEventListener('touchstart', onTouchStart, { passive: true })
+    container.addEventListener('touchend', onTouchEnd, { passive: true })
+    return () => {
+      container.removeEventListener('touchstart', onTouchStart)
+      container.removeEventListener('touchend', onTouchEnd)
+    }
+  }, [map, spots, onSelect, onOpenModal])
+
   return null
 }
 
