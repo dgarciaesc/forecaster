@@ -10,6 +10,7 @@ import MobileLayout from './components/MobileLayout'
 import RotatePrompt from './components/RotatePrompt'
 import MobileSpotSheet from './components/MobileSpotSheet'
 import OnboardingModal from './components/OnboardingModal'
+import AlertModal from './components/AlertModal'
 import { useMobile } from './hooks/useMobile'
 
 const TOKEN_KEY = 'wavepulse_token'
@@ -27,6 +28,7 @@ export default function App() {
   const [modalSpot, setModalSpot] = useState(null)
   const [showHeatmap, setShowHeatmap] = useState(true)
   const [selectedDay, setSelectedDay] = useState(null)
+  const [showAlert, setShowAlert] = useState(false)
 
   function handleLogin(credentialResponse) {
     const t = credentialResponse.credential
@@ -84,6 +86,7 @@ export default function App() {
         />
       )}
       <DaySelector spots={spots} selectedDay={selectedDay} onChange={setSelectedDay} />
+      <AlertButton onClick={() => setShowAlert(true)} />
     <HeatmapToggle active={showHeatmap} onChange={setShowHeatmap} />
     </>
   )
@@ -106,11 +109,32 @@ export default function App() {
           {mapOnly}
         </MobileLayout>
         {modalSpot && <MobileSpotSheet spot={modalSpot} sport={effectiveSport} onClose={() => setModalSpot(null)} />}
+        {showAlert && (
+          <AlertModal
+            onClose={() => setShowAlert(false)}
+            spots={spots}
+            initialSport={sport}
+            initialLevel={level}
+          />
+        )}
       </div>
     )
   }
 
-  const mapContent = <>{mapOnly}{modal}</>
+  const mapContent = (
+    <>
+      {mapOnly}
+      {modal}
+      {showAlert && (
+        <AlertModal
+          onClose={() => setShowAlert(false)}
+          spots={spots}
+          initialSport={sport}
+          initialLevel={level}
+        />
+      )}
+    </>
+  )
 
   return (
     <div style={styles.shell}>
@@ -195,6 +219,37 @@ function DaySelector({ spots, selectedDay, onChange }) {
         )
       })}
     </div>
+  )
+}
+
+function AlertButton({ onClick }) {
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        position: 'absolute',
+        top: 10,
+        right: 12,
+        zIndex: 1000,
+        background: 'linear-gradient(135deg, #f97316, #ef4444)',
+        border: 'none',
+        color: '#fff',
+        borderRadius: 10,
+        padding: '9px 16px',
+        fontSize: 13,
+        fontWeight: 700,
+        cursor: 'pointer',
+        display: 'flex',
+        alignItems: 'center',
+        gap: 7,
+        boxShadow: '0 4px 16px rgba(249,115,22,0.5)',
+        backdropFilter: 'blur(4px)',
+        letterSpacing: '0.02em',
+      }}
+    >
+      <span style={{ fontSize: 16 }}>🔔</span>
+      Alertas
+    </button>
   )
 }
 

@@ -28,19 +28,37 @@ function waveColor(m) {
 
 // Score → background color
 function scoreColor(s) {
-  if (s >= 80) return { bg: '#1a4d1a', text: '#86e986' }
-  if (s >= 65) return { bg: '#2d5a1b', text: '#a3ed6b' }
-  if (s >= 50) return { bg: '#5a4a00', text: '#f0d060' }
-  if (s >= 35) return { bg: '#5a2800', text: '#ff9966' }
-  return              { bg: '#2a0000', text: '#ff6666' }
+  if (s >= 85) return { bg: '#1a4d1a' }
+  if (s >= 70) return { bg: '#243d1a' }
+  if (s >= 55) return { bg: '#3d3a00' }
+  if (s >= 35) return { bg: '#3d2200' }
+  if (s >= 20) return { bg: '#2a0000' }
+  return              { bg: '#1a0a0a' }
 }
 
-// Arrow rotated to show where wind blows TO
+// Score → star icons (0–5 stars, 0 = mal)
+function ScoreStars({ score }) {
+  let filled, color
+  if (score >= 85)      { filled = 5; color = '#86e986' }
+  else if (score >= 70) { filled = 4; color = '#a3ed6b' }
+  else if (score >= 55) { filled = 3; color = '#f0d060' }
+  else if (score >= 35) { filled = 2; color = '#ffb347' }
+  else if (score >= 20) { filled = 1; color = '#ff6666' }
+  else                  { filled = 0; color = '#4a2020' }
+
+  return (
+    <span style={{ fontSize: 11, letterSpacing: 1, color }} title={`${Math.round(score)}`}>
+      {'★'.repeat(filled)}{'☆'.repeat(5 - filled)}
+    </span>
+  )
+}
+
+// Arrow rotated to show where wind blows TO (FROM + 180°)
 function WindArrow({ deg }) {
   return (
     <span style={{
       display: 'inline-block',
-      transform: `rotate(${deg}deg)`,
+      transform: `rotate(${(deg + 180) % 360}deg)`,
       fontSize: 14,
       lineHeight: 1,
     }}>↑</span>
@@ -154,6 +172,19 @@ export default function WindguruModal({ spot, sport, onClose }) {
                 })}
               </tr>
 
+              {/* Wind gusts */}
+              <tr>
+                <td style={s.rowLabel}>💨 Rachas (kn)</td>
+                {allCols.map((h, i) => {
+                  const c = windColor(h.wind_gust ?? 0)
+                  return (
+                    <td key={i} style={{ ...s.dataCell, background: c.bg, color: c.text, fontStyle: 'italic' }}>
+                      {Math.round(h.wind_gust ?? 0)}
+                    </td>
+                  )
+                })}
+              </tr>
+
               {/* Wind direction */}
               <tr>
                 <td style={s.rowLabel}>🧭 Dir. viento</td>
@@ -200,14 +231,14 @@ export default function WindguruModal({ spot, sport, onClose }) {
               {/* Sport score */}
               <tr>
                 <td style={{ ...s.rowLabel, color: accentColor }}>
-                  ⭐ Score {SPORT_LABEL[sport]}
+                  ★ Score {SPORT_LABEL[sport]}
                 </td>
                 {allCols.map((h, i) => {
                   const score = h.scores?.[sport] ?? 0
                   const c = scoreColor(score)
                   return (
-                    <td key={i} style={{ ...s.dataCell, background: c.bg, color: c.text, fontWeight: 700 }}>
-                      {Math.round(score)}
+                    <td key={i} style={{ ...s.dataCell, background: c.bg, textAlign: 'center' }}>
+                      <ScoreStars score={score} />
                     </td>
                   )
                 })}

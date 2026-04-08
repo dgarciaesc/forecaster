@@ -316,9 +316,10 @@ async def fetch_spot_forecast(lat: float, lon: float) -> dict[str, Any]:
         loop.run_in_executor(None, functools.partial(_fetch_sync,
             "https://api.open-meteo.com/v1/forecast", {
                 "latitude": lat, "longitude": lon,
-                "hourly": "windspeed_10m,winddirection_10m",
+                "hourly": "windspeed_10m,winddirection_10m,windgusts_10m",
                 "wind_speed_unit": "kn",
                 "timezone": "Europe/Madrid", "forecast_days": 7,
+                "models": "gfs_seamless",
             })),
     )
     return {"marine": marine, "weather": weather}
@@ -351,6 +352,7 @@ def build_hourly_forecast(raw: dict, coast_facing: float = 0) -> list[dict]:
     wave_d = dict(zip(marine["time"],  marine["wave_direction"]))
     wind_s = dict(zip(weather["time"], weather["windspeed_10m"]))
     wind_d = dict(zip(weather["time"], weather["winddirection_10m"]))
+    wind_g = dict(zip(weather["time"], weather["windgusts_10m"]))
 
     hours = []
     for t in marine["time"]:
@@ -364,11 +366,13 @@ def build_hourly_forecast(raw: dict, coast_facing: float = 0) -> list[dict]:
         wd   = wave_d.get(t) or 0.0
         ws   = wind_s.get(t) or 0.0
         wdir = wind_d.get(t) or 0.0
+        wg   = wind_g.get(t) or 0.0
 
         scores = compute_scores(wh, wp, ws, wdir, coast_facing)
         hours.append({
             "time":        t,
             "wind_speed":  round(ws, 1),
+            "wind_gust":   round(wg, 1),
             "wind_dir":    round(wdir, 0),
             "wave_height": round(wh, 2),
             "wave_period": round(wp, 1),

@@ -1,3 +1,5 @@
+const DAY_LETTERS = ['D', 'L', 'M', 'X', 'J', 'V', 'S']
+
 function qualityColor(days) {
   if (days >= 6) return '#22c55e'
   if (days >= 4) return '#84cc16'
@@ -6,7 +8,37 @@ function qualityColor(days) {
   return '#ef4444'
 }
 
+function dayScoreColor(score) {
+  if (score >= 85) return '#22c55e'
+  if (score >= 70) return '#84cc16'
+  if (score >= 55) return '#eab308'
+  if (score >= 35) return '#f97316'
+  if (score >= 20) return '#ef4444'
+  return '#334155'
+}
+
 const MEDALS = ['🥇', '🥈', '🥉']
+
+function DayStrip({ spot, sport }) {
+  const days = spot.days ?? []
+  if (!days.length) return null
+
+  return (
+    <div style={styles.dayStrip}>
+      {days.map((d) => {
+        const score = d.scores?.[sport] ?? 0
+        const color = dayScoreColor(score)
+        const letter = DAY_LETTERS[new Date(d.date + 'T12:00:00').getDay()]
+        return (
+          <div key={d.date} style={styles.dayCell} title={`${d.date}: ${Math.round(score)}`}>
+            <div style={{ ...styles.dayDot, background: color }} />
+            <span style={{ ...styles.dayLetter, color }}>{letter}</span>
+          </div>
+        )
+      })}
+    </div>
+  )
+}
 
 export default function Ranking({ spots, sport, selected, onSelect }) {
   if (!spots.length) {
@@ -34,33 +66,34 @@ export default function Ranking({ spots, sport, selected, onSelect }) {
         return (
           <div
             key={spot.id}
-            onClick={() => onSelect(isSelected ? null : spot)}
             style={{
-              ...styles.item,
-              background: isSelected ? 'var(--panel2)' : 'transparent',
+              borderBottom: '1px solid var(--border)',
               borderLeft: isSelected ? `3px solid ${color}` : '3px solid transparent',
+              background: isSelected ? 'var(--panel2)' : 'transparent',
+              transition: 'background 0.1s',
             }}
           >
-            <div style={styles.rank}>
-              {i < 3 ? MEDALS[i] : <span style={styles.rankNum}>{i + 1}</span>}
-            </div>
-            <div style={styles.info}>
-              <div style={styles.name}>{spot.name}</div>
-              <div style={styles.region}>{spot.region}</div>
-              <div style={styles.barWrap}>
-                <div
-                  style={{
-                    ...styles.bar,
-                    width: `${(spot.qd / 7) * 100}%`,
-                    background: color,
-                  }}
-                />
+            <div
+              onClick={() => onSelect(isSelected ? null : spot)}
+              style={styles.item}
+            >
+              <div style={styles.rank}>
+                {i < 3 ? MEDALS[i] : <span style={styles.rankNum}>{i + 1}</span>}
+              </div>
+              <div style={styles.info}>
+                <div style={styles.name}>{spot.name}</div>
+                <div style={styles.region}>{spot.region}</div>
+                <div style={styles.barWrap}>
+                  <div style={{ ...styles.bar, width: `${(spot.qd / 7) * 100}%`, background: color }} />
+                </div>
+              </div>
+              <div style={{ ...styles.days, color }}>
+                <span style={styles.daysNum}>{spot.qd}</span>
+                <span style={styles.daysOf}>/7</span>
               </div>
             </div>
-            <div style={{ ...styles.days, color }}>
-              <span style={styles.daysNum}>{spot.qd}</span>
-              <span style={styles.daysOf}>/7</span>
-            </div>
+
+            {isSelected && <DayStrip spot={spot} sport={sport} />}
           </div>
         )
       })}
@@ -79,8 +112,6 @@ const styles = {
     gap: 10,
     padding: '10px 12px 10px 10px',
     cursor: 'pointer',
-    borderBottom: '1px solid var(--border)',
-    transition: 'background 0.1s',
   },
   rank: {
     width: 28,
@@ -132,6 +163,27 @@ const styles = {
   daysOf: {
     fontSize: 11,
     color: 'var(--muted)',
+  },
+  dayStrip: {
+    display: 'flex',
+    gap: 4,
+    padding: '6px 12px 10px 48px',
+  },
+  dayCell: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: 3,
+    flex: 1,
+  },
+  dayDot: {
+    width: 8,
+    height: 8,
+    borderRadius: '50%',
+  },
+  dayLetter: {
+    fontSize: 10,
+    fontWeight: 700,
   },
   empty: {
     flex: 1,
