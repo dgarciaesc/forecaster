@@ -75,6 +75,8 @@ export default function AlertModal({ onClose, spots, initialSport = 'surf', init
   const [spotId, setSpotId]   = useState('all')
   const [email, setEmail]     = useState('')
   const [sent, setSent]       = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [error, setError]     = useState('')
 
   useEffect(() => {
     const handler = e => { if (e.key === 'Escape') onClose() }
@@ -86,11 +88,24 @@ export default function AlertModal({ onClose, spots, initialSport = 'surf', init
   const firstColor = SPORTS.find(s => s.id === activeSportIds[0])?.color ?? 'var(--surf)'
   const canSubmit = email && activeSportIds.length > 0
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault()
-    if (!canSubmit) return
-    console.log('Alert config:', { selectedSports, days, weekend, noRain, spotId, email })
-    setSent(true)
+    if (!canSubmit || loading) return
+    setLoading(true)
+    setError('')
+    try {
+      const res = await fetch('/api/alerts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, sports: selectedSports, days, weekend, no_rain: noRain, zone: spotId }),
+      })
+      if (!res.ok) throw new Error('Error del servidor')
+      setSent(true)
+    } catch (err) {
+      setError('No se pudo guardar la alerta. Inténtalo de nuevo.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   const ZONE_LABELS = {
@@ -224,18 +239,20 @@ export default function AlertModal({ onClose, spots, initialSport = 'surf', init
               style={s.input}
             />
 
+            {error && <span style={{ fontSize: 12, color: '#ef4444' }}>{error}</span>}
             <button
               type="submit"
-              disabled={!canSubmit}
+              disabled={!canSubmit || loading}
               style={{
                 ...s.submitBtn,
                 background: canSubmit ? `${firstColor}33` : 'transparent',
                 borderColor: canSubmit ? firstColor : '#1e3a5f',
                 color: canSubmit ? firstColor : 'var(--muted)',
-                cursor: canSubmit ? 'pointer' : 'default',
+                cursor: canSubmit && !loading ? 'pointer' : 'default',
+                opacity: loading ? 0.6 : 1,
               }}
             >
-              Activar alerta
+              {loading ? 'Guardando…' : 'Activar alerta'}
             </button>
           </form>
         )}

@@ -235,8 +235,8 @@ function AlertButton({ onClick }) {
         border: 'none',
         color: '#fff',
         borderRadius: 10,
-        padding: '9px 16px',
-        fontSize: 13,
+        padding: '13px 22px',
+        fontSize: 16,
         fontWeight: 700,
         cursor: 'pointer',
         display: 'flex',
@@ -247,7 +247,7 @@ function AlertButton({ onClick }) {
         letterSpacing: '0.02em',
       }}
     >
-      <span style={{ fontSize: 16 }}>🔔</span>
+      <span style={{ fontSize: 20 }}>🔔</span>
       Alertas
     </button>
   )

@@ -11,10 +11,12 @@ from fastapi import FastAPI, HTTPException, BackgroundTasks, Header, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
+from pydantic import BaseModel
 
 from spots import SPOTS, SEA_POINTS
 from forecaster import fetch_spot_forecast, build_daily_forecast, build_hourly_forecast, summarize
-from db import init_db, save_spots, load_spots, last_refresh
+from db import init_db, save_spots, load_spots, last_refresh, save_alert
+from alerts import check_and_send_alerts
 
 AUTH_ENABLED      = os.getenv("AUTH_ENABLED", "false").lower() == "true"
 GOOGLE_CLIENT_ID  = os.getenv("GOOGLE_CLIENT_ID", "")
@@ -75,6 +77,7 @@ async def _fetch_spot(spot: dict) -> dict:
     if "name" in spot:
         result["name"]   = spot["name"]
         result["region"] = spot["region"]
+        result["zone"]   = spot.get("zone", "")
         result["days"]   = days
         result["hourly"] = hourly
     return result
@@ -105,6 +108,7 @@ async def do_refresh():
         _snapshot     = spots_data
         _sea_snapshot = sea_data
         print(f"[refresh] done — {len(spots_data)} spots, {len(sea_data)} sea points")
+        asyncio.create_task(asyncio.to_thread(check_and_send_alerts, spots_data))
     except Exception as e:
         import traceback
         print(f"[refresh] ERROR: {e}\n{traceback.format_exc()}")
@@ -146,7 +150,7 @@ app = FastAPI(title="Forecaster API", lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173", "http://localhost:3000"],
-    allow_methods=["GET"],
+    allow_methods=["GET", "POST"],
     allow_headers=["Authorization", "Content-Type"],
 )
 
@@ -171,6 +175,23 @@ async def health():
     age = int(time.time() - last_refresh())
     return {"status": "ok", "spots": len(_snapshot) if _snapshot else 0,
             "refreshing": _refreshing, "data_age_s": age}
+
+
+class AlertRequest(BaseModel):
+    email:   str
+    sports:  dict   # {"surf": "expert", "windsurf": "beginner", ...}
+    days:    int  = 3
+    weekend: bool = False
+    no_rain: bool = False
+    zone:    str  = "all"
+
+
+@app.post("/api/alerts")
+async def create_alert(req: AlertRequest):
+    if not req.email or not req.sports:
+        raise HTTPException(status_code=400, detail="email and sports required")
+    save_alert(req.email, req.sports, req.days, req.weekend, req.no_rain, req.zone)
+    return {"status": "ok"}
 
 
 # ── Serve React SPA (must be last) ────────────────────────────────────────────
