@@ -194,6 +194,21 @@ async def create_alert(req: AlertRequest):
     return {"status": "ok"}
 
 
+@app.get("/api/test-email")
+async def test_email(to: str):
+    from alerts import _send_email, SMTP_USER, SMTP_PASS
+    if not SMTP_USER or not SMTP_PASS:
+        raise HTTPException(status_code=500, detail="SMTP not configured")
+    try:
+        await asyncio.to_thread(_send_email, to,
+            "✅ Test Forecaster",
+            "<div style='font-family:sans-serif;padding:24px'><h2>¡Funciona! 🏄</h2><p>El servidor de alertas de Forecaster está configurado correctamente.</p></div>"
+        )
+        return {"status": "sent", "to": to}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 # ── Serve React SPA (must be last) ────────────────────────────────────────────
 STATIC_DIR = Path(__file__).parent.parent / "frontend" / "dist"
 if STATIC_DIR.exists():
