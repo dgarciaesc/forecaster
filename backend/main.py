@@ -198,21 +198,18 @@ async def create_alert(req: AlertRequest):
 async def test_email(to: str):
     import alerts as _alerts
     import importlib, os
-    importlib.reload(_alerts)  # pick up env vars set after startup
-    smtp_user = os.getenv("SMTP_USER", "")
-    smtp_pass = os.getenv("SMTP_PASS", "")
-    smtp_host = os.getenv("SMTP_HOST", "smtp.ionos.es")
-    smtp_port = os.getenv("SMTP_PORT", "587")
-    if not smtp_user or not smtp_pass:
-        return {"status": "error", "detail": "SMTP_USER or SMTP_PASS not set", "smtp_host": smtp_host, "smtp_port": smtp_port}
+    importlib.reload(_alerts)
+    api_key = os.getenv("RESEND_API_KEY", "")
+    if not api_key:
+        return {"status": "error", "detail": "RESEND_API_KEY not set"}
     try:
         await asyncio.to_thread(_alerts._send_email, to,
             "✅ Test Forecaster",
             "<div style='font-family:sans-serif;padding:24px'><h2>¡Funciona! 🏄</h2><p>El servidor de alertas de Forecaster está configurado correctamente.</p></div>"
         )
-        return {"status": "sent", "to": to, "from": smtp_user}
+        return {"status": "sent", "to": to}
     except Exception as e:
-        return {"status": "error", "detail": str(e), "type": type(e).__name__, "smtp_host": smtp_host, "smtp_port": smtp_port, "smtp_user": smtp_user}
+        return {"status": "error", "detail": str(e), "type": type(e).__name__}
 
 
 # ── Serve React SPA (must be last) ────────────────────────────────────────────

@@ -1,18 +1,14 @@
-"""Alert checking and email delivery via IONOS SMTP."""
+"""Alert checking and email delivery via Resend API."""
 import json
 import os
-import smtplib
 from datetime import date, datetime
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
+
+import requests
 
 from db import load_alerts, update_alert_sent
 
-SMTP_HOST  = os.getenv("SMTP_HOST",  "smtp.ionos.com")
-SMTP_PORT  = int(os.getenv("SMTP_PORT", "587"))
-SMTP_USER  = os.getenv("SMTP_USER",  "")
-SMTP_PASS  = os.getenv("SMTP_PASS",  "")
-FROM_EMAIL = os.getenv("FROM_EMAIL", SMTP_USER)
+RESEND_API_KEY = os.getenv("RESEND_API_KEY", "")
+FROM_EMAIL     = os.getenv("FROM_EMAIL", "onboarding@resend.dev")
 
 QUALITY_THRESHOLD = 60
 WEEKDAYS = {5, 6}  # Saturday, Sunday
@@ -124,27 +120,19 @@ def _build_email(sports_json: str, matching: list[tuple]) -> tuple[str, str]:
 
 
 def _send_email(to_email: str, subject: str, body_html: str):
-    msg = MIMEMultipart("alternative")
-    msg["Subject"] = subject
-    msg["From"]    = FROM_EMAIL
-    msg["To"]      = to_email
-    msg.attach(MIMEText(body_html, "html", "utf-8"))
-
-    if SMTP_PORT == 465:
-        with smtplib.SMTP_SSL(SMTP_HOST, SMTP_PORT, timeout=15) as smtp:
-            smtp.login(SMTP_USER, SMTP_PASS)
-            smtp.sendmail(FROM_EMAIL, [to_email], msg.as_string())
-    else:
-        with smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=15) as smtp:
-            smtp.ehlo()
-            smtp.starttls()
-            smtp.login(SMTP_USER, SMTP_PASS)
-            smtp.sendmail(FROM_EMAIL, [to_email], msg.as_string())
+    resp = requests.post(
+        "https://api.resend.com/emails",
+        headers={"Authorization": f"Bearer {RESEND_API_KEY}"},
+        json={"from": FROM_EMAIL, "to": [to_email], "subject": subject, "html": body_html},
+        timeout=15,
+    )
+    if resp.status_code not in (200, 201):
+        raise RuntimeError(f"Resend API error {resp.status_code}: {resp.text}")
 
 
 def check_and_send_alerts(spots: list[dict]):
-    if not SMTP_USER or not SMTP_PASS:
-        print("[alerts] SMTP_USER/SMTP_PASS not set — skipping alert check")
+    if not RESEND_API_KEY:
+        print("[alerts] RESEND_API_KEY not set — skipping alert check")
         return
 
     alerts = load_alerts()
