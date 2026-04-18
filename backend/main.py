@@ -196,17 +196,23 @@ async def create_alert(req: AlertRequest):
 
 @app.get("/api/test-email")
 async def test_email(to: str):
-    from alerts import _send_email, SMTP_USER, SMTP_PASS
-    if not SMTP_USER or not SMTP_PASS:
-        raise HTTPException(status_code=500, detail="SMTP not configured")
+    import alerts as _alerts
+    import importlib, os
+    importlib.reload(_alerts)  # pick up env vars set after startup
+    smtp_user = os.getenv("SMTP_USER", "")
+    smtp_pass = os.getenv("SMTP_PASS", "")
+    smtp_host = os.getenv("SMTP_HOST", "smtp.ionos.es")
+    smtp_port = os.getenv("SMTP_PORT", "587")
+    if not smtp_user or not smtp_pass:
+        return {"status": "error", "detail": "SMTP_USER or SMTP_PASS not set", "smtp_host": smtp_host, "smtp_port": smtp_port}
     try:
-        await asyncio.to_thread(_send_email, to,
+        await asyncio.to_thread(_alerts._send_email, to,
             "✅ Test Forecaster",
             "<div style='font-family:sans-serif;padding:24px'><h2>¡Funciona! 🏄</h2><p>El servidor de alertas de Forecaster está configurado correctamente.</p></div>"
         )
-        return {"status": "sent", "to": to}
+        return {"status": "sent", "to": to, "from": smtp_user}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        return {"status": "error", "detail": str(e), "type": type(e).__name__, "smtp_host": smtp_host, "smtp_port": smtp_port, "smtp_user": smtp_user}
 
 
 # ── Serve React SPA (must be last) ────────────────────────────────────────────
