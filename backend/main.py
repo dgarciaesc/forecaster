@@ -15,7 +15,7 @@ from pydantic import BaseModel
 
 from spots import SPOTS, SEA_POINTS
 from forecaster import fetch_spot_forecast, build_daily_forecast, build_hourly_forecast, summarize
-from db import init_db, save_spots, load_spots, last_refresh, save_alert
+from db import init_db, save_spots, load_spots, last_refresh, save_alert, load_alerts_by_email, delete_alert
 from alerts import check_and_send_alerts
 
 AUTH_ENABLED      = os.getenv("AUTH_ENABLED", "false").lower() == "true"
@@ -184,6 +184,19 @@ class AlertRequest(BaseModel):
     weekend: bool = False
     no_rain: bool = False
     zone:    str  = "all"
+
+
+@app.get("/api/alerts")
+async def get_alerts(email: str):
+    if not email:
+        raise HTTPException(status_code=400, detail="email required")
+    return load_alerts_by_email(email)
+
+
+@app.delete("/api/alerts/{alert_id}")
+async def remove_alert(alert_id: int):
+    delete_alert(alert_id)
+    return {"status": "ok"}
 
 
 @app.post("/api/alerts")

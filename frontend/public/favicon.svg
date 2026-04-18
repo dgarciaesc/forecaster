@@ -1,25 +1,29 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <!-- Background circle -->
+  <!-- Background -->
   <circle cx="32" cy="32" r="32" fill="#0d1b2a"/>
 
   <!-- Radar rings -->
-  <circle cx="32" cy="32" r="26" fill="none" stroke="#1e3a5f" stroke-width="1.5"/>
-  <circle cx="32" cy="32" r="18" fill="none" stroke="#1e3a5f" stroke-width="1.5"/>
-  <circle cx="32" cy="32" r="10" fill="none" stroke="#1e3a5f" stroke-width="1.5"/>
+  <circle cx="32" cy="32" r="26" fill="none" stroke="#1e4a7a" stroke-width="1.5"/>
+  <circle cx="32" cy="32" r="17" fill="none" stroke="#1e4a7a" stroke-width="1.5"/>
+  <circle cx="32" cy="32" r="9"  fill="none" stroke="#1e4a7a" stroke-width="1.5"/>
 
   <!-- Cross hairs -->
-  <line x1="32" y1="6" x2="32" y2="58" stroke="#1e3a5f" stroke-width="1"/>
-  <line x1="6" y1="32" x2="58" y2="32" stroke="#1e3a5f" stroke-width="1"/>
+  <line x1="32" y1="5"  x2="32" y2="59" stroke="#1e4a7a" stroke-width="1"/>
+  <line x1="5"  y1="32" x2="59" y2="32" stroke="#1e4a7a" stroke-width="1"/>
 
-  <!-- Radar sweep (filled wedge) -->
-  <path d="M32 32 L32 6 A26 26 0 0 1 57.5 42 Z" fill="#38bdf8" fill-opacity="0.25"/>
-  <line x1="32" y1="32" x2="57.5" y2="42" stroke="#38bdf8" stroke-width="2" stroke-linecap="round"/>
-  <line x1="32" y1="32" x2="32" y2="6" stroke="#38bdf8" stroke-width="1.5" stroke-linecap="round" stroke-opacity="0.5"/>
+  <!-- Radar sweep wedge -->
+  <path d="M32 32 L32 6 A26 26 0 0 1 57.5 42 Z" fill="#38bdf8" fill-opacity="0.2"/>
+
+  <!-- Sweep trailing glow -->
+  <path d="M32 32 L48 10 A26 26 0 0 1 57.5 42 Z" fill="#38bdf8" fill-opacity="0.15"/>
+
+  <!-- Sweep arm -->
+  <line x1="32" y1="32" x2="57.5" y2="42" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round"/>
 
   <!-- Center dot -->
-  <circle cx="32" cy="32" r="3" fill="#38bdf8"/>
+  <circle cx="32" cy="32" r="3.5" fill="#38bdf8"/>
 
   <!-- Blip -->
-  <circle cx="46" cy="22" r="2.5" fill="#38bdf8" fill-opacity="0.9"/>
-  <circle cx="46" cy="22" r="5" fill="none" stroke="#38bdf8" stroke-width="1" stroke-opacity="0.4"/>
+  <circle cx="47" cy="21" r="3"   fill="#38bdf8"/>
+  <circle cx="47" cy="21" r="6"   fill="none" stroke="#38bdf8" stroke-width="1.2" stroke-opacity="0.5"/>
 </svg>

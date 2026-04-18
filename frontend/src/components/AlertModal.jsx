@@ -67,6 +67,87 @@ function SportGrid({ selectedSports, onChange }) {
   )
 }
 
+const SPORT_LABELS = {
+  surf:               'Surf ⚡',
+  surf_beginner:      'Surf 🌊',
+  windsurf:           'Windsurf ⚡',
+  windsurf_beginner:  'Windsurf 🌊',
+  wingfoil:           'Wingfoil ⚡',
+  wingfoil_beginner:  'Wingfoil 🌊',
+  kitesurf:           'Kitesurf ⚡',
+  kitesurf_beginner:  'Kitesurf 🌊',
+}
+
+const ZONE_LABELS = {
+  all: 'Todas las zonas',
+  cantabrico_oriental: 'Cantábrico oriental',
+  cantabrico_occidental: 'Cantábrico occidental',
+  atlantico_norte: 'Atlántico norte',
+  portugal_sur: 'Portugal Sur',
+  andalucia_occidental: 'Andalucía occidental',
+  mediterraneo_sur: 'Mediterráneo sur',
+  levante: 'Levante',
+  cataluna: 'Cataluña',
+  baleares: 'Baleares',
+  canarias: 'Canarias',
+}
+
+function sportKey(id, level) {
+  return level === 'beginner' ? `${id}_beginner` : id
+}
+
+function ExistingAlerts({ email, refresh, onRefresh }) {
+  const [alerts, setAlerts] = useState([])
+
+  useEffect(() => {
+    if (!email || !email.includes('@')) return
+    fetch(`/api/alerts?email=${encodeURIComponent(email)}`)
+      .then(r => r.json())
+      .then(setAlerts)
+      .catch(() => {})
+  }, [email, refresh])
+
+  async function handleDelete(id) {
+    await fetch(`/api/alerts/${id}`, { method: 'DELETE' })
+    onRefresh()
+  }
+
+  if (!alerts.length) return null
+
+  return (
+    <div style={{ marginTop: 12 }}>
+      <div style={s.label}>Tus alertas activas</div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 4 }}>
+        {alerts.map(a => {
+          const sports = JSON.parse(a.sports)
+          const sportsStr = Object.entries(sports)
+            .map(([id, lvl]) => SPORT_LABELS[sportKey(id, lvl)] ?? id)
+            .join(', ')
+          const condStr = a.weekend
+            ? 'fines de semana'
+            : `mín. ${a.days} día${a.days > 1 ? 's' : ''}`
+          return (
+            <div key={a.id} style={s.alertRow}>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 13, color: '#e2e8f0', fontWeight: 600 }}>{sportsStr}</div>
+                <div style={{ fontSize: 11, color: '#64748b', marginTop: 2 }}>
+                  {condStr} · {ZONE_LABELS[a.zone] ?? a.zone}
+                  {a.no_rain ? ' · sin lluvia' : ''}
+                </div>
+              </div>
+              <button
+                onClick={() => handleDelete(a.id)}
+                style={s.deleteBtn}
+                title="Eliminar alerta"
+              >✕</button>
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
 export default function AlertModal({ onClose, spots, initialSport = 'surf', initialLevel = 'expert' }) {
   const [selectedSports, setSelectedSports] = useState({ [initialSport]: initialLevel })
   const [days, setDays]       = useState(3)
@@ -77,6 +158,7 @@ export default function AlertModal({ onClose, spots, initialSport = 'surf', init
   const [sent, setSent]       = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError]     = useState('')
+  const [alertsKey, setAlertsKey] = useState(0)
 
   useEffect(() => {
     const handler = e => { if (e.key === 'Escape') onClose() }
@@ -101,25 +183,12 @@ export default function AlertModal({ onClose, spots, initialSport = 'surf', init
       })
       if (!res.ok) throw new Error('Error del servidor')
       setSent(true)
+      setAlertsKey(k => k + 1)
     } catch (err) {
       setError('No se pudo guardar la alerta. Inténtalo de nuevo.')
     } finally {
       setLoading(false)
     }
-  }
-
-  const ZONE_LABELS = {
-    all: 'todas las zonas',
-    cantabrico_oriental: 'Cantábrico oriental',
-    cantabrico_occidental: 'Cantábrico occidental',
-    atlantico_norte: 'Atlántico norte',
-    portugal_sur: 'Portugal Sur',
-    andalucia_occidental: 'Andalucía occidental',
-    mediterraneo_sur: 'Mediterráneo sur',
-    levante: 'Levante',
-    cataluna: 'Cataluña',
-    baleares: 'Baleares',
-    canarias: 'Canarias',
   }
 
   const sportSummary = activeSportIds
@@ -142,6 +211,24 @@ export default function AlertModal({ onClose, spots, initialSport = 'surf', init
           <button style={s.closeBtn} onClick={onClose}>✕</button>
         </div>
 
+        <div style={s.form}>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+            <label style={s.label}>Tu correo</label>
+            <span style={{ fontSize: 11, color: '#475569' }}>se mostrarán tus alertas activas al escribirlo</span>
+          </div>
+          <input
+            type="email"
+            value={email}
+            onChange={e => { setEmail(e.target.value); setSent(false) }}
+            placeholder="correo@ejemplo.com"
+            style={s.input}
+          />
+
+          <ExistingAlerts email={email} refresh={alertsKey} onRefresh={() => setAlertsKey(k => k + 1)} />
+        </div>
+
+        <div style={s.divider} />
+
         {sent ? (
           <div style={s.successWrap}>
             <div style={s.successIcon}>✓</div>
@@ -150,9 +237,9 @@ export default function AlertModal({ onClose, spots, initialSport = 'surf', init
               Te avisaremos en <strong>{email}</strong> para <strong>{sportSummary}</strong>
               {weekend ? ', fines de semana' : ` con mínimo ${days} día${days > 1 ? 's' : ''}`}
               {noRain ? ', solo días sin lluvia' : ''}
-              {` en ${ZONE_LABELS[spotId] ?? 'todas las zonas'}`}.
+              {` en ${ZONE_LABELS[spotId] ?? spotId}`}.
             </p>
-            <button style={{ ...s.submitBtn, background: '#1e3a5f', color: '#e2e8f0', borderColor: '#1e3a5f', marginTop: 16 }} onClick={onClose}>Cerrar</button>
+            <button style={{ ...s.submitBtn, background: '#1e3a5f', color: '#e2e8f0', borderColor: '#1e3a5f', marginTop: 16 }} onClick={() => setSent(false)}>Nueva alerta</button>
           </div>
         ) : (
           <form onSubmit={handleSubmit} style={s.form}>
@@ -228,16 +315,6 @@ export default function AlertModal({ onClose, spots, initialSport = 'surf', init
               <option value="baleares">Baleares</option>
               <option value="canarias">Canarias</option>
             </select>
-
-            <label style={s.label}>Tu correo</label>
-            <input
-              type="email"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              placeholder="correo@ejemplo.com"
-              required
-              style={s.input}
-            />
 
             {error && <span style={{ fontSize: 12, color: '#ef4444' }}>{error}</span>}
             <button
@@ -360,4 +437,18 @@ const s = {
   },
   successText: { fontSize: 18, fontWeight: 800, color: '#e2e8f0', margin: 0 },
   successSub:  { fontSize: 13, color: '#94a3b8', lineHeight: 1.6, margin: 0 },
+  alertRow: {
+    display: 'flex', alignItems: 'center', gap: 8,
+    padding: '8px 10px', borderRadius: 8,
+    background: '#111e35', border: '1px solid #1e3a5f',
+  },
+  deleteBtn: {
+    background: 'transparent', border: 'none',
+    color: '#64748b', fontSize: 14, cursor: 'pointer',
+    padding: '2px 6px', borderRadius: 4, flexShrink: 0,
+    transition: 'color 0.15s',
+  },
+  divider: {
+    borderTop: '1px solid #1e3a5f', margin: '0 20px',
+  },
 }

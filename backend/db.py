@@ -84,6 +84,17 @@ def load_alerts() -> list[dict]:
     return [dict(r) for r in rows]
 
 
+def load_alerts_by_email(email: str) -> list[dict]:
+    with _conn() as con:
+        rows = con.execute("SELECT * FROM alerts WHERE email=? ORDER BY created_at DESC", (email,)).fetchall()
+    return [dict(r) for r in rows]
+
+
+def delete_alert(alert_id: int):
+    with _conn() as con:
+        con.execute("DELETE FROM alerts WHERE id=?", (alert_id,))
+
+
 def update_alert_sent(alert_id: int):
     with _conn() as con:
         con.execute("UPDATE alerts SET last_sent=? WHERE id=?", (time.time(), alert_id))
