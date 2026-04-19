@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react'
 
+const MQ = window.matchMedia('(max-width: 767px)')
+
 export function useMobile() {
-  const [mobile, setMobile] = useState(window.innerWidth < 768)
+  const [mobile, setMobile] = useState(MQ.matches)
   useEffect(() => {
-    const handler = () => setMobile(window.innerWidth < 768)
-    window.addEventListener('resize', handler)
-    return () => window.removeEventListener('resize', handler)
+    const handler = e => setMobile(e.matches)
+    MQ.addEventListener('change', handler)
+    return () => MQ.removeEventListener('change', handler)
   }, [])
   return mobile
 }
