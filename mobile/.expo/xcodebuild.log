@@ -1,0 +1,3 @@
+Command line invocation:
+    /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild -workspace /Users/U01ADC2F/projects/forecaster/mobile/ios/WavePulse.xcworkspace -configuration Debug -scheme WavePulse -destination id=00008140-001A25042680401C
+

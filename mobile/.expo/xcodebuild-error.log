@@ -1,0 +1,24 @@
+2026-04-26 12:06:46.674 xcodebuild[14834:5411800] Writing error result bundle to /var/folders/kz/q7b0v4_x1398xqcxxpv3zm3h0000gn/T/ResultBundle_2026-26-04_12-06-0046.xcresult
+xcodebuild: error: Unable to find a device matching the provided destination specifier:
+		{ id:00008140-001A25042680401C }
+
+	The requested device could not be found because no available devices matched the request.
+
+	Available destinations for the "WavePulse" scheme:
+		{ platform:macOS, arch:arm64, variant:Designed for [iPad,iPhone], id:00008122-000611111411001C, name:My Mac }
+		{ platform:iOS, id:dvtdevice-DVTiPhonePlaceholder-iphoneos:placeholder, name:Any iOS Device }
+		{ platform:iOS Simulator, id:dvtdevice-DVTiOSDeviceSimulatorPlaceholder-iphonesimulator:placeholder, name:Any iOS Simulator Device }
+		{ platform:iOS Simulator, arch:arm64, id:F8CDA9D5-C780-4DFE-89E8-B6C739B96E79, OS:26.4.1, name:iPad (A16) }
+		{ platform:iOS Simulator, arch:arm64, id:5B65C42D-9DB9-4D18-A6D0-69114E72C668, OS:26.4.1, name:iPad Air 11-inch (M4) }
+		{ platform:iOS Simulator, arch:arm64, id:5BA209A7-A5C6-4BB7-9487-BD53F8772DCD, OS:26.4.1, name:iPad Air 13-inch (M4) }
+		{ platform:iOS Simulator, arch:arm64, id:6BEF1195-6221-4EA4-BBA8-3F978200C741, OS:26.4.1, name:iPad Pro 11-inch (M5) }
+		{ platform:iOS Simulator, arch:arm64, id:B35F72FB-97DD-4121-A2C5-204A04C803BA, OS:26.4.1, name:iPad Pro 13-inch (M5) }
+		{ platform:iOS Simulator, arch:arm64, id:A48E15D9-A4FC-4838-9DE2-F5EA06C1F67C, OS:26.4.1, name:iPad mini (A17 Pro) }
+		{ platform:iOS Simulator, arch:arm64, id:D72D5553-1F86-4CF3-A1AE-742CE3304B9D, OS:26.4.1, name:iPhone 17 }
+		{ platform:iOS Simulator, arch:arm64, id:30306537-8AE1-4EB7-AC1D-31A7105F10BF, OS:26.4.1, name:iPhone 17 Pro }
+		{ platform:iOS Simulator, arch:arm64, id:1B7AC7B9-49FA-4F26-92EE-2754B75FDA62, OS:26.4.1, name:iPhone 17 Pro Max }
+		{ platform:iOS Simulator, arch:arm64, id:CBFEBACD-6560-4918-9EA7-2EA8CD6786C1, OS:26.4.1, name:iPhone 17e }
+		{ platform:iOS Simulator, arch:arm64, id:F86788A9-C204-4873-A807-74AB114DD6E9, OS:26.4.1, name:iPhone Air }
+
+	Ineligible destinations for the "WavePulse" scheme:
+		{ platform:iOS, arch:arm64e, id:00008140-001A25042680401C, name:iPhone 16ProMax de Laura, error:iPhone 16ProMax de Laura is not available because pairing is in progress. Respond to the trust dialog on the device if present, and wait until pairing has completed. }
